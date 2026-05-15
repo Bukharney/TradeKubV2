@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-axios.defaults.baseURL = "https://tradekub.bukharney.site";
+axios.defaults.baseURL = "https://tradekub.jirapat.site";
 
 export const handleLogin = async (data) => {
   return await axios

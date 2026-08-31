@@ -38,6 +38,12 @@ jobs:
         run: pnpm test || echo "No test script defined"
 
       - name: Build production bundle
+        env:
+          # Disable the CRA ESLint plugin during build.
+          # eslint-config-react-app's jest overrides use "jest/globals" which
+          # is unsupported in newer eslint-plugin-jest versions.
+          # Linting is already handled by the separate "Lint code" step above.
+          DISABLE_ESLINT_PLUGIN: "true"
         run: pnpm build
 
   # ── 2. Build & push Docker image (linux/arm64) to GHCR ──────────────────

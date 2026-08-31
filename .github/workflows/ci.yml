@@ -84,5 +84,7 @@ jobs:
             ghcr.io/${{ env.REPO_LC }}:latest
             ghcr.io/${{ env.REPO_LC }}:${{ github.sha }}
           platforms: linux/arm64
+          build-args: |
+            REACT_APP_API_URL=${{ vars.REACT_APP_API_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

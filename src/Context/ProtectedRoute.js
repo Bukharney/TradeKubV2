@@ -8,3 +8,4 @@ export const ProtectedRoute = ({ children }) => {
     return children;
   } else return <Navigate to="/Login" />;
 };
+

@@ -80,3 +80,4 @@ export const mockStockDetails = {
   free_float: 96417,
   major_shareholders: 12894,
 };
+

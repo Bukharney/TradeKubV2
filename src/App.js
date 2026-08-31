@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
-import { Navbar } from "./component/Page/Navbar/Navbar";
-import { HeaderBar } from "./component/Page/Navbar/HeaderBar";
-import { Login } from "./component/Page/Login/Login";
-import { Home } from "./component/Page/Homepage/Home";
-import { Market } from "./component/Page/Market/Market";
-import { Wallet } from "./component/Page/Wallet/Wallet";
-import { News } from "./component/Page/News/News";
-import { Notification } from "./component/Page/Notification/Notification.js";
-import { Profile } from "./component/Page/Profile/Profile";
-import AuthContext from "./Context/AuthContext";
-import TokenContext from "./Context/TokenContext";
-import AccountContext from "./Context/AccountContext";
-import { ProtectedRoute } from "./Context/ProtectedRoute";
+import { Navbar } from "./components/Navbar/Navbar";
+import { HeaderBar } from "./components/HeaderBar/HeaderBar";
+import { Login } from "./pages/Login/Login";
+import { Home } from "./pages/Homepage/Home";
+import { Market } from "./pages/Market/Market";
+import { Wallet } from "./pages/Wallet/Wallet";
+import { News } from "./pages/News/News";
+import { Notification } from "./pages/Notification/Notification";
+import { Profile } from "./pages/Profile/Profile";
+import AuthContext from "./context/AuthContext";
+import TokenContext from "./context/TokenContext";
+import AccountContext from "./context/AccountContext";
+import { ProtectedRoute } from "./context/ProtectedRoute";
 import Cookies from "js-cookie";
 import "./App.css";
-import Register from "./component/Page/Register/Register";
-import { View } from "./component/Page/View/View";
+import Register from "./pages/Register/Register";
+import { View } from "./pages/View/View";
 
-import { AnalyticPage } from "./component/Page/AnalyticPage/AnalyticPage";
-import { SelectAccount } from "./component/Page/SelectAccount/SelectAccount";
-import axios, { getStoredToken, clearStoredTokens } from "./API/axiosClient";
-import EditUser from "./component/Page/EditUserProfile/EditUser";
+import { AnalyticPage } from "./pages/AnalyticPage/AnalyticPage";
+import { SelectAccount } from "./pages/SelectAccount/SelectAccount";
+import axios, { getStoredToken, clearStoredTokens } from "./services/axiosClient";
+import EditUser from "./pages/EditUserProfile/EditUser";
 
 
 function AppShell({ auth }) {
@@ -190,3 +190,4 @@ function App() {
 }
 
 export default App;
+

@@ -88,3 +88,29 @@ jobs:
             REACT_APP_API_URL=${{ vars.REACT_APP_API_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # ── 3. Deploy to server via SSH ────────────────────────────────────────────
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            set -e
+
+            # Pull the new frontend image
+            podman pull ghcr.io/${{ github.repository_owner }}/projecttradekub:latest
+
+            # Restart the frontend container
+            cd ~/tradekub
+            podman-compose -f podman-compose.yml up -d --pull=never frontend
+
+            echo "✅ Tradekub frontend deployed successfully"
+

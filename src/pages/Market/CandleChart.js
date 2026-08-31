@@ -27,8 +27,8 @@ function CandleChart({ data, interval = "1M" }) {
         ? data.time
         : closeArray.map((_, i) => nowSec - (closeArray.length - 1 - i) * stepSec);
 
-      const formatDateLabel = (timestamp, idx) => {
-        if (!timestamp) return `Bar ${idx + 1}`;
+      const parseDate = (timestamp) => {
+        if (!timestamp) return new Date();
         const date = new Date(
           typeof timestamp === "number"
             ? timestamp < 1e11
@@ -36,23 +36,27 @@ function CandleChart({ data, interval = "1M" }) {
               : timestamp
             : timestamp
         );
-        if (isNaN(date.getTime())) return String(timestamp);
+        return isNaN(date.getTime()) ? new Date() : date;
+      };
 
-        const pad = (n) => String(n).padStart(2, "0");
+      const pad = (n) => String(n).padStart(2, "0");
+      const months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      ];
+
+      const formatAxisLabel = (timestamp) => {
+        const date = parseDate(timestamp);
         const hours = pad(date.getHours());
         const minutes = pad(date.getMinutes());
         const day = pad(date.getDate());
-        const months = [
-          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        ];
         const month = months[date.getMonth()];
         const year = date.getFullYear();
 
         if (interval === "1D") {
           return `${hours}:${minutes}`;
         } else if (interval === "5D") {
-          return `${day} ${month} ${hours}:${minutes}`;
+          return `${day} ${month}`;
         } else if (interval === "1Y") {
           return `${month} ${year}`;
         } else {
@@ -60,21 +64,38 @@ function CandleChart({ data, interval = "1M" }) {
         }
       };
 
+      const formatTooltipLabel = (timestamp) => {
+        const date = parseDate(timestamp);
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+        const day = pad(date.getDate());
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+
+        return `${day} ${month} ${year} ${hours}:${minutes}`;
+      };
+
       const formattedData = closeArray.map((_, index) => {
         const timeVal = rawTimeArray[index];
-        const label = formatDateLabel(timeVal, index);
+        const axisLabel = formatAxisLabel(timeVal);
+        const fullTooltip = formatTooltipLabel(timeVal);
         const open = Number(openArray[index] ?? closeArray[index] ?? 0);
         const high = Number(highArray[index] ?? Math.max(open, closeArray[index] ?? 0));
         const low = Number(lowArray[index] ?? Math.min(open, closeArray[index] ?? 0));
         const close = Number(closeArray[index] ?? open);
 
         return {
-          x: label,
+          x: axisLabel,
           y: [open, high, low, close],
+          fullTime: fullTooltip,
           volume: volumeArray[index] ?? 0,
           value: valueArray[index] ?? 0,
         };
       });
+
+      const totalBars = formattedData.length;
+      const targetTickCount = Math.min(totalBars, 6);
+      const step = Math.max(1, Math.floor(totalBars / targetTickCount));
 
       const chartOptions = {
         chart: {
@@ -116,18 +137,26 @@ function CandleChart({ data, interval = "1M" }) {
         ],
         xaxis: {
           type: "category",
-          tickAmount: 5,
-          tickPlacement: "on",
+          tickPlacement: "between",
           labels: {
             show: true,
             rotate: 0,
             rotateAlways: false,
-            hideOverlappingLabels: true,
-            trim: true,
+            hideOverlappingLabels: false,
+            trim: false,
             style: {
               colors: "#8E9093",
               fontSize: "11px",
               fontFamily: "Poppins, sans-serif",
+            },
+            formatter: function (val, timestamp, opts) {
+              if (!opts || typeof opts.i !== "number") return val || "";
+              const idx = opts.i;
+              // Show label on first, last, and every `step` bar to prevent overlapping and truncation
+              if (idx === 0 || idx === totalBars - 1 || idx % step === 0) {
+                return val;
+              }
+              return "";
             },
           },
           axisBorder: {
@@ -135,8 +164,7 @@ function CandleChart({ data, interval = "1M" }) {
             color: "#282A2E",
           },
           axisTicks: {
-            show: true,
-            color: "#282A2E",
+            show: false,
           },
         },
         yaxis: {
@@ -179,15 +207,18 @@ function CandleChart({ data, interval = "1M" }) {
             const h = w.globals.seriesCandleH[seriesIndex][dataPointIndex];
             const l = w.globals.seriesCandleL[seriesIndex][dataPointIndex];
             const c = w.globals.seriesCandleC[seriesIndex][dataPointIndex];
-            const xLabel = w.globals.categoryLabels[dataPointIndex] || "";
+            const fullTime =
+              formattedData[dataPointIndex]?.fullTime ||
+              w.globals.categoryLabels[dataPointIndex] ||
+              "";
             const isUp = c >= o;
             const change = c - o;
             const changePercent = o > 0 ? ((change / o) * 100).toFixed(2) : "0.00";
             const colorClass = isUp ? "#00E396" : "#FF334B";
 
             return `
-              <div style="background: #181A1F; border: 1px solid #282A2E; padding: 10px 14px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); min-width: 140px;">
-                <div style="color: #A0A3A8; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid #282A2E; padding-bottom: 4px;">${xLabel}</div>
+              <div style="background: #181A1F; border: 1px solid #282A2E; padding: 10px 14px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); min-width: 150px;">
+                <div style="color: #A0A3A8; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid #282A2E; padding-bottom: 4px;">${fullTime}</div>
                 <div style="display: flex; justify-content: space-between; margin: 3px 0; font-size: 12px;">
                   <span style="color: #71757D;">Open:</span>
                   <span style="color: #FFF; font-weight: 500;">${o?.toFixed(2)}</span>

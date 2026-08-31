@@ -1,7 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import env from "../env";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+const BASE_URL = env.REACT_APP_API_URL;
 
 const axiosClient = axios.create({
   baseURL: BASE_URL,

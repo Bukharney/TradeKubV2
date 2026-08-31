@@ -15,10 +15,10 @@
   --text-muted: #8e95a5;
   --text-bright: #ffffff;
 
-  --accent-green: #42a93c;
-  --accent-green-bg: rgba(66, 169, 60, 0.15);
-  --accent-red: #cd3d42;
-  --accent-red-bg: rgba(205, 61, 66, 0.15);
+  --accent-green: #00E396;
+  --accent-green-bg: rgba(0, 227, 150, 0.15);
+  --accent-red: #FF334B;
+  --accent-red-bg: rgba(255, 51, 75, 0.15);
   --accent-blue: #3b82f6;
   --accent-blue-hover: #2563eb;
   --accent-cyan: #ccff00;

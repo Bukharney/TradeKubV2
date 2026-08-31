@@ -59,7 +59,7 @@ export const Home = () => {
                         <p
                           style={{
                             color:
-                              StockItem.ChangeP1 > 0 ? "#42A93C" : "#CD3D42",
+                              StockItem.ChangeP1 > 0 ? "#00E396" : "#FF334B",
                           }}
                         >
                           {StockItem.ChangeP1}
@@ -87,7 +87,7 @@ export const Home = () => {
                         <p
                           style={{
                             color:
-                              StockItem.ChangeP2 > 0 ? "#42A93C" : "#CD3D42",
+                              StockItem.ChangeP2 > 0 ? "#00E396" : "#FF334B",
                           }}
                         >
                           {StockItem.ChangeP2}
@@ -105,7 +105,7 @@ export const Home = () => {
               Top Movers
               <span
                 style={{
-                  color: "#42A93C",
+                  color: "#00E396",
                   fontWeight: 400,
                   paddingLeft: "0.5rem",
                 }}
@@ -128,7 +128,7 @@ export const Home = () => {
                         <p
                           style={{
                             color:
-                              StockItem.ChangeU1 > 0 ? "#42A93C" : "#CD3D42",
+                              StockItem.ChangeU1 > 0 ? "#00E396" : "#FF334B",
                           }}
                         >
                           {StockItem.ChangeU1}
@@ -155,7 +155,7 @@ export const Home = () => {
                         <p
                           style={{
                             color:
-                              StockItem.ChangeU2 > 0 ? "#42A93C" : "#CD3D42",
+                              StockItem.ChangeU2 > 0 ? "#00E396" : "#FF334B",
                           }}
                         >
                           {StockItem.ChangeU2}
@@ -173,7 +173,7 @@ export const Home = () => {
               Top Movers
               <span
                 style={{
-                  color: "#CD3D42",
+                  color: "#FF334B",
                   fontWeight: 400,
                   paddingLeft: "0.5rem",
                 }}
@@ -196,7 +196,7 @@ export const Home = () => {
                         <p
                           style={{
                             color:
-                              StockItem.ChangeD1 > 0 ? "#42A93C" : "#CD3D42",
+                              StockItem.ChangeD1 > 0 ? "#00E396" : "#FF334B",
                           }}
                         >
                           {StockItem.ChangeD1}
@@ -223,7 +223,7 @@ export const Home = () => {
                         <p
                           style={{
                             color:
-                              StockItem.ChangeD2 > 0 ? "#42A93C" : "#CD3D42",
+                              StockItem.ChangeD2 > 0 ? "#00E396" : "#FF334B",
                           }}
                         >
                           {StockItem.ChangeD2}

@@ -240,8 +240,8 @@ export const Market = () => {
                 style={{
                   color:
                     ((marketData?.price_info?.change ?? marketData?.quote_symbol?.percentChange) || 0) >= 0
-                      ? "#42A93C"
-                      : "#CD3D42",
+                      ? "#00E396"
+                      : "#FF334B",
                 }}
               >
                 {formatNumber(marketData?.price_info?.last ?? marketData?.quote_symbol?.last ?? 0)}
@@ -257,8 +257,8 @@ export const Market = () => {
                   style={{
                     color:
                       ((marketData?.price_info?.change ?? marketData?.quote_symbol?.change) || 0) >= 0
-                        ? "#42A93C"
-                        : "#CD3D42",
+                        ? "#00E396"
+                        : "#FF334B",
                   }}
                 >
                   {formatNumber(marketData?.price_info?.change ?? marketData?.quote_symbol?.percentChange ?? 0)}
@@ -279,8 +279,8 @@ export const Market = () => {
                   style={{
                     color:
                       ((marketData?.price_info?.change ?? marketData?.quote_symbol?.percentChange) || 0) >= 0
-                        ? "#42A93C"
-                        : "#CD3D42",
+                        ? "#00E396"
+                        : "#FF334B",
                   }}
                 >
                   {formatNumber(marketData?.bid_offer?.bid_price1 || 0)}
@@ -293,8 +293,8 @@ export const Market = () => {
                   style={{
                     color:
                       ((marketData?.price_info?.change ?? marketData?.quote_symbol?.percentChange) || 0) >= 0
-                        ? "#42A93C"
-                        : "#CD3D42",
+                        ? "#00E396"
+                        : "#FF334B",
                   }}
                 >
                   {formatNumber(marketData?.bid_offer?.ask_price1 || 0)}
@@ -323,7 +323,7 @@ export const Market = () => {
             <span
               className="Market__stock__High__value"
               style={{
-                color: "#42A93C",
+                color: "#00E396",
               }}
             >
               {formatNumber(marketData?.price_info?.high ?? marketData?.quote_symbol?.high ?? 0)}
@@ -332,7 +332,7 @@ export const Market = () => {
             <span
               className="Market__stock__Low__value"
               style={{
-                color: "#CD3D42",
+                color: "#FF334B",
               }}
             >
               {formatNumber(marketData?.price_info?.low ?? marketData?.quote_symbol?.low ?? 0)}
@@ -341,7 +341,7 @@ export const Market = () => {
             <span
               className="Market__stock__Open__value"
               style={{
-                color: "#42A93C",
+                color: "#00E396",
               }}
             >
               {formatNumber(
@@ -354,7 +354,7 @@ export const Market = () => {
             <span
               className="Market__stock__floor__value"
               style={{
-                color: "#CD3D42",
+                color: "#FF334B",
               }}
             >
               {formatNumber(
@@ -575,7 +575,7 @@ export const Market = () => {
                         key={index}
                         className="Market__container__right__Container__box1"
                         style={{
-                          color: stock.change >= 0 ? "#42A93C" : "#CD3D42",
+                          color: stock.change >= 0 ? "#00E396" : "#FF334B",
                         }}
                       >
                         <div className="Market__container__right__stock__Symbol">
@@ -713,7 +713,7 @@ export const Market = () => {
                       </div>
                       <div
                         className="Market__search__modal__item__chg"
-                        style={{ color: (stk.change || 0) >= 0 ? "#42A93C" : "#CD3D42" }}
+                        style={{ color: (stk.change || 0) >= 0 ? "#00E396" : "#FF334B" }}
                       >
                         {(stk.change || 0) > 0 ? `+${stk.change.toFixed(2)}` : (stk.change || 0).toFixed(2)}
                       </div>

@@ -107,7 +107,7 @@ export const Wallet = () => {
   }, [Account.account, Token.token]);
 
   const palettes = [
-    "#00CB76",
+    "#00E396",
     "#AD00FF",
     "#29B1C3",
     "#424CA0",
@@ -276,9 +276,9 @@ export const Wallet = () => {
                   style={{
                     backgroundColor:
                       stock.change > 0
-                        ? "#42A93C"
+                        ? "#00E396"
                         : stock.change < 0
-                        ? "#CD3D42"
+                        ? "#FF334B"
                         : "#F2B807",
                   }}
                 >
@@ -321,7 +321,7 @@ export const Wallet = () => {
                 <div
                   className="wallet__table__UnrealizedPL__value"
                   style={{
-                    color: stock.upl >= 0 ? "#42A93C" : "#CD3D42",
+                    color: stock.upl >= 0 ? "#00E396" : "#FF334B",
                   }}
                 >
                   {stock.upl >= 0
@@ -334,7 +334,7 @@ export const Wallet = () => {
                 <div
                   className="wallet__table__UnrealizedPLPercent__value"
                   style={{
-                    color: stock.upl_per >= 0 ? "#42A93C" : "#CD3D42",
+                    color: stock.upl_per >= 0 ? "#00E396" : "#FF334B",
                   }}
                 >
                   {stock.upl2 >= 0
@@ -368,7 +368,7 @@ export const Wallet = () => {
                       className="transaction__side"
                       style={{
                         color:
-                          transaction.side === "Buy" ? "#42A93C" : "#CD3D42",
+                          transaction.side === "Buy" ? "#00E396" : "#FF334B",
                       }}
                     >
                       {transaction.side.toUpperCase()}

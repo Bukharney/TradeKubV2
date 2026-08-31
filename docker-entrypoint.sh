@@ -4,7 +4,7 @@
 
 cat > /usr/share/nginx/html/env-config.js << EOF
 window.env = {
-  REACT_APP_API_URL: "${REACT_APP_API_URL:-http://localhost:8000}"
+  REACT_APP_API_URL: "${REACT_APP_API_URL:-/api}"
 };
 EOF
 

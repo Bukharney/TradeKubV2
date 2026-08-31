@@ -141,7 +141,7 @@ function Goverment() {
 
   const get_all_user = async (e) => {
     await axios
-      .get(`http://127.0.0.1:8000/users/${e}`, {
+      .get(`/users/${e}`, {
         headers: {
           accept: "application/json",
           Authorization: "Bearer " + token,

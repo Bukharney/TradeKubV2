@@ -56,9 +56,12 @@ export const clearStoredTokens = () => {
   localStorage.removeItem("access_token");
 };
 
-// Request interceptor to automatically attach Authorization token
+// Request interceptor to automatically attach Authorization token and dynamically set baseURL
 axiosClient.interceptors.request.use(
   (config) => {
+    // Dynamically resolve baseURL on every single request
+    config.baseURL = env.REACT_APP_API_URL;
+
     const token = getStoredToken();
 
     if (token) {

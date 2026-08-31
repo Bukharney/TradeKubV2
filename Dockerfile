@@ -1,5 +1,5 @@
-# ── Stage 1: Build ────────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+# ── Stage 1: Build (Runs NATIVELY on runner CPU for maximum speed) ────────────
+FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@9 --activate
@@ -9,17 +9,19 @@ WORKDIR /app
 # Copy dependency manifests first for better layer caching
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install --frozen-lockfile
+# Use BuildKit cache mount to avoid re-downloading packages
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Copy the rest of the source and build
 COPY . .
 
-# Disable the CRA ESLint plugin (jest/globals incompatibility with newer eslint-plugin-jest)
+# Disable the CRA ESLint plugin during build
 ENV DISABLE_ESLINT_PLUGIN=true
 
 RUN pnpm build
 
-# ── Stage 2: Serve ────────────────────────────────────────────────────────────
+# ── Stage 2: Serve (Target platform: linux/arm64 nginx) ───────────────────────
 FROM nginx:stable-alpine AS runner
 
 # Remove default nginx static assets

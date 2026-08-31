@@ -116,9 +116,14 @@ function CandleChart({ data, interval = "1M" }) {
         ],
         xaxis: {
           type: "category",
-          tickAmount: Math.min(formattedData.length, 10),
+          tickAmount: 5,
+          tickPlacement: "on",
           labels: {
+            show: true,
             rotate: 0,
+            rotateAlways: false,
+            hideOverlappingLabels: true,
+            trim: true,
             style: {
               colors: "#8E9093",
               fontSize: "11px",
@@ -126,9 +131,11 @@ function CandleChart({ data, interval = "1M" }) {
             },
           },
           axisBorder: {
+            show: true,
             color: "#282A2E",
           },
           axisTicks: {
+            show: true,
             color: "#282A2E",
           },
         },

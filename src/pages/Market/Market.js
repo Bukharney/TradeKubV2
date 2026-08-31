@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import "./Market.css";
 import CandleChart from "./CandleChart";
-import CandleChart2 from "./CandleChart2";
-import CandleChart3 from "./CandleChart3";
 import axios from "../../services/axiosClient";
 import TokenContext from "../../Context/TokenContext";
 import AccountContext from "../../Context/AccountContext";
@@ -393,33 +391,13 @@ export const Market = () => {
           active={isLoadingGraph}
           spinner
           className="Market__container__Graph"
-          style={{
-            "@media screen and (max-width: 1599px)": {
-              display: "flex",
-            },
-            "@media screen and (min-width: 1600px) and (max-width: 1800px)": {
-              display: "flex",
-            },
-            "@media screen and (min-width: 1801px)": {
-              display: "flex",
-            },
-          }}
         >
           {(() => {
-            const chartData = marketData?.candlestick_50limit || (marketData?.close ? marketData : null);
-            return (
-              <>
-                {window.innerWidth <= 1599 && (
-                  <CandleChart data={chartData} interval={selectedInterval} height="100%" />
-                )}
-                {window.innerWidth >= 1600 && window.innerWidth <= 1800 && (
-                  <CandleChart2 data={chartData} interval={selectedInterval} height="100%" />
-                )}
-                {window.innerWidth >= 1801 && (
-                  <CandleChart3 data={chartData} interval={selectedInterval} height="100%" />
-                )}
-              </>
-            );
+            const chartData =
+              marketData?.candlestick_50limit || (marketData?.close ? marketData : null);
+            return chartData ? (
+              <CandleChart data={chartData} interval={selectedInterval} />
+            ) : null;
           })()}
         </LoadingOverlay>
         <div className="Market__container__mid__Footer">

@@ -294,10 +294,19 @@
 /* Candle Chart Container */
 .Market__container__Graph {
   flex: 1;
-  min-height: 280px;
+  min-height: 300px;
   background-color: var(--bg-dark);
-  padding: 12px;
+  padding: 10px 14px 4px 6px;
   position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.Market__container__Graph ._loading_overlay_wrapper {
+  width: 100%;
+  height: 100%;
+  flex: 1;
 }
 
 /* Bottom Order Execution Panel */

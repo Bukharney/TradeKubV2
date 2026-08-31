@@ -3,7 +3,7 @@ import "./Login.css";
 import background from "./background.svg";
 import show_password from "./show_password.svg";
 import hide_password from "./hide_password.svg";
-import AuthContext from "../../context/AuthContext";
+import AuthContext from "../../Context/AuthContext";
 import { handleLogin } from "../../services/API";
 
 export const Login = () => {

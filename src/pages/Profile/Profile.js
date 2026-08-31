@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./Profile.css";
 import "boxicons/css/boxicons.min.css";
-import AuthContext from "../../context/AuthContext";
+import AuthContext from "../../Context/AuthContext";
 import Cookies from "js-cookie";
 import axios, { clearStoredTokens } from "../../services/axiosClient";
-import TokenContext from "../../context/TokenContext";
-import AccountContext from "../../context/AccountContext";
+import TokenContext from "../../Context/TokenContext";
+import AccountContext from "../../Context/AccountContext";
 import LoadingOverlay from "react-loading-overlay";
 
 export const Profile = () => {

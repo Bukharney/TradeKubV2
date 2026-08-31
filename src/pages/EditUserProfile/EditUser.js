@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./EditUser.css";
 import axios from "../../services/axiosClient";
-import TokenContext from "../../context/TokenContext";
+import TokenContext from "../../Context/TokenContext";
 import { useNavigate } from "react-router-dom";
 
 export const EditUser = () => {

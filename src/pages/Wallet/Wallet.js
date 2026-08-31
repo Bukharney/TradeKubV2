@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { value } from "../../components/Navbar/Navbar.js";
 import ApexCharts from "apexcharts";
 import axios from "../../services/axiosClient";
-import TokenContext from "../../context/TokenContext";
-import AccountContext from "../../context/AccountContext";
+import TokenContext from "../../Context/TokenContext";
+import AccountContext from "../../Context/AccountContext";
 import LoadingOverlay from "react-loading-overlay";
 
 export const Wallet = () => {

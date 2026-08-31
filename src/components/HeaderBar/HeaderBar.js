@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HeaderBar.css";
-import TokenContext from "../../context/TokenContext";
-import AccountContext from "../../context/AccountContext";
-import AuthContext from "../../context/AuthContext";
+import TokenContext from "../../Context/TokenContext";
+import AccountContext from "../../Context/AccountContext";
+import AuthContext from "../../Context/AuthContext";
 import Cookies from "js-cookie";
 import axios, { clearStoredTokens } from "../../services/axiosClient";
 

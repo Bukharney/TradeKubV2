@@ -3,8 +3,8 @@ import { NavLink, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import "boxicons/css/boxicons.min.css";
 import axios from "../../services/axiosClient";
-import TokenContext from "../../context/TokenContext";
-import AccountContext from "../../context/AccountContext";
+import TokenContext from "../../Context/TokenContext";
+import AccountContext from "../../Context/AccountContext";
 
 const storedValue = localStorage.getItem("key");
 const defaultValue = { key: 0 };

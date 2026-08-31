@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./News.css";
 import "boxicons/css/boxicons.min.css";
-import TokenContext from "../../context/TokenContext";
+import TokenContext from "../../Context/TokenContext";
 import axios from "../../services/axiosClient";
 
 const CATEGORIES = ["All", "Market", "Economy", "Stocks"];

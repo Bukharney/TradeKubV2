@@ -2,9 +2,9 @@ import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Notification.css";
 import "boxicons/css/boxicons.min.css";
-import TokenContext from "../../context/TokenContext";
+import TokenContext from "../../Context/TokenContext";
 import axios from "../../services/axiosClient";
-import AccountContext from "../../context/AccountContext";
+import AccountContext from "../../Context/AccountContext";
 
 export const Notification = () => {
   const [click, setClick] = useState(false);

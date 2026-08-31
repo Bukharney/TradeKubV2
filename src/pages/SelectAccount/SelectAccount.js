@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import "./SelectAcc.css";
 import axios from "../../services/axiosClient";
-import TokenContext from "../../context/TokenContext";
-import AccountContext from "../../context/AccountContext";
+import TokenContext from "../../Context/TokenContext";
+import AccountContext from "../../Context/AccountContext";
 import Logo from "./Logo.svg";
 import Cookies from "js-cookie";
 

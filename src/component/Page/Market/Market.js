@@ -37,7 +37,6 @@ export const Market = () => {
   const [userAccount, setUserAccount] = useState([]);
   const [userOrder, setUserOrder] = useState([]);
   const [userStock, setUserStock] = useState([]);
-  const [userSearch, setUserSearch] = useState([]);
   const [isLoadingGraph, setIsLoadingGraph] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState("");
@@ -136,54 +135,12 @@ export const Market = () => {
     console.log("Reset order clicked");
   };
 
-  const handleSelectStock = (e) => {
-    console.log(e);
-    console.log(userSearch[e].symbol);
-    setSymbol(userSearch[e].symbol);
-  };
-
-  const handleInputFocus1 = () => {
-    setInputBorderColor1("#CCFF00");
-  };
-
-  const handleInputBlur1 = () => {
-    setInputBorderColor1("");
-  };
-
-  const handleInputFocus2 = () => {
-    setInputBorderColor2("#CCFF00");
-  };
-
-  const handleInputBlur2 = () => {
-    setInputBorderColor2("");
-  };
-
-  const handleInputFocus3 = () => {
-    setInputBorderColor3("#CCFF00");
-  };
-
-  const handleInputBlur3 = () => {
-    setInputBorderColor3("");
-  };
-
-  const get_search_stock = async (symbol) => {
-    await axios
-      .get(`/stock/search/${symbol}`)
-      .then((response) => {
-        console.log(response.data);
-        setUserSearch([...response.data, ...userSearch]);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleKeyDown = async (event) => {
-    if (event.key === "Enter") {
-      console.log(event.target.value);
-      get_search_stock(event.target.value);
-    }
-  };
+  const handleInputFocus1 = () => setInputBorderColor1("#CCFF00");
+  const handleInputBlur1 = () => setInputBorderColor1("");
+  const handleInputFocus2 = () => setInputBorderColor2("#CCFF00");
+  const handleInputBlur2 = () => setInputBorderColor2("");
+  const handleInputFocus3 = () => setInputBorderColor3("#CCFF00");
+  const handleInputBlur3 = () => setInputBorderColor3("");
 
   useEffect(() => {
     setIsLoadingGraph(true);
@@ -256,7 +213,7 @@ export const Market = () => {
     );
   }
 
-  const availableStocksList = userStock.length > 0 ? userStock : userSearch;
+  const availableStocksList = userStock;
   const filteredStocks = availableStocksList.filter((stk) =>
     stk.symbol.toLowerCase().includes(modalSearchTerm.toLowerCase())
   );
@@ -412,7 +369,7 @@ export const Market = () => {
             <span className="Market__stock__Average__value">
               {formatNumber(marketData?.price_info?.last ?? marketData?.quote_symbol?.average ?? 0)}
             </span>
-            <sapn className="Market__stock__Close">Close</sapn>
+            <span className="Market__stock__Close">Close</span>
             <span className="Market__stock__Close__value">
               {formatNumber(
                 marketData?.price_info?.close ?? marketData?.candlestick_1limit?.close?.[0] ?? 0

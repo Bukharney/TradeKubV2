@@ -185,6 +185,7 @@ export const Wallet = () => {
     return () => {
       chart.destroy();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [SortedStock]);
 
   return (
@@ -195,7 +196,7 @@ export const Wallet = () => {
         <div className="balance__container__text">
           <div className="balance__Total__Wealth">Total Wealth</div>
           <div className="balance__Total__Wealth__value">
-            {userPort.map((stock) => {
+            {userPort.forEach((stock) => {
               total +=
                 (stock.close === 0 ? stock.last_price : stock.close) *
                 stock.volume;

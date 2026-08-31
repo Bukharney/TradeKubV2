@@ -1,7 +1,6 @@
 //ดึงข้อมูลทุกแถวของแต่ละ Table ลงนี่เลย เดะ query ใน databaseTable.js เอา
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import axiosClient from "../../../API/axiosClient";
-import TokenContext from "../../../Context/TokenContext";
 
 export let UserData = [
   {
@@ -290,7 +289,6 @@ export const AllDataUpdate = () => {
         dividendRows,
         newsRows,*/
 
-  const Token = useContext(TokenContext);
   let [UserDataServer, setUser] = useState([]);
   let [AccountDataServer, setAccount] = useState([]);
   let [BrokerDataServer, setBroker] = useState([]);

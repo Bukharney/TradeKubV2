@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import "./NewsManagement.css"; // Import the CSS file for additional styles
-import axios from "axios";
+import axios from "../../../API/axiosClient";
 import TokenContext from "../../../Context/TokenContext";
 
 export const NewsManagement = () => {

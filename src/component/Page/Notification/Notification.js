@@ -1,137 +1,159 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Notification.css";
 import "boxicons/css/boxicons.min.css";
 import TokenContext from "../../../Context/TokenContext";
-import axios from "axios";
+import axios from "../../../API/axiosClient";
 import AccountContext from "../../../Context/AccountContext";
 
-axios.defaults.baseURL = "https://tradekub.me";
-
-export const Notification = ({ value, hasRefresh }) => {
+export const Notification = () => {
   const [click, setClick] = useState(false);
   const [data, setData] = useState([]);
+  const [activeTab, setActiveTab] = useState("All");
   const Token = useContext(TokenContext);
   const Account = useContext(AccountContext);
+  const navigate = useNavigate();
 
-  const get_time = (dateString) => {
-    const notificationTime = new Date(dateString);
-    const currentTime = new Date();
-    const timeDifference = currentTime - notificationTime;
+  const getTime = (dateString) => {
+    if (!dateString) return "Just now";
+    const options = { hour: "2-digit", minute: "2-digit" };
+    return new Date(dateString).toLocaleTimeString(undefined, options);
+  };
 
-    if (timeDifference > 0) {
-      const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-      const minutes = Math.floor(
-        (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
-      );
-      if (hours === 0) {
-        return `${minutes} minutes ago`;
-      }
-      return `${hours} hours ${minutes} minutes ago`;
+  const deleteNotification = async (id, e) => {
+    if (e) e.stopPropagation();
+    try {
+      await axios.get(`/noti/delete/${id}`);
+      setData((prev) => prev.filter((item) => item.id !== id));
+      setClick(!click);
+    } catch (error) {
+      console.error("Failed to delete notification", error);
     }
   };
 
-  const del_noti = async (e) => {
-    await axios
-      .get(`/noti/delete/${e}`, {
-        headers: {
-          accept: "*/*",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        setClick(!click);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const clearAllNotifications = async () => {
+    try {
+      await Promise.all(data.map((item) => axios.get(`/noti/delete/${item.id}`)));
+      setData([]);
+    } catch (error) {
+      console.error("Failed to clear notifications", error);
+    }
   };
 
   useEffect(() => {
-    const get_noti = async (e) => {
-      await axios
-        .get(`/noti/${e}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          setData(response.data);
-        })
-        .catch((error) => {
-          console.error(error.response);
-          setData([]);
-        });
+    const fetchNotifications = async (accountId) => {
+      try {
+        const response = await axios.get(`/noti/${accountId}`);
+        setData(response.data || []);
+      } catch (error) {
+        console.error(error.response);
+        setData([]);
+      }
     };
 
-    get_noti(Account.account);
-  }, [Account.account, Token.token, click]);
+    if (Account?.account) {
+      fetchNotifications(Account.account);
+    }
+  }, [Account?.account, Token?.token, click]);
 
-  const handleClick1 = () => {
-    value["key"] = 1;
-    hasRefresh["rkey"] = 1;
-    localStorage.setItem("key", JSON.stringify(value));
-    setClick(!click);
+  const handleClose = () => {
+    navigate(-1);
   };
 
-  if (value["key"] !== 3) {
-    return null;
-  } else if (data == null || (data && data.length === 0)) {
-    return (
-      <div className="Notification">
-        <div className="Nofitication__Container">
-          <div className="Notication__Box">
-            <div className="Nofitication__Header">Notification</div>
-            <div className="TextNonoti">No Notifications Yet!</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const filteredData = data.filter((item) => {
+    if (activeTab === "Orders") {
+      return item.message?.toLowerCase().includes("order") || item.volume;
+    }
+    if (activeTab === "System") {
+      return !item.message?.toLowerCase().includes("order") && !item.volume;
+    }
+    return true;
+  });
 
   return (
-    <div className="Notification">
-      <div className="Nofitication__Container">
-        <div className="Notication__Box">
-          <div className="Nofitication__Header">Notification</div>
-          {data
-            ? data.map((Inbox, index) => {
-                return (
-                  <div className="Notification_Item" key={index}>
-                    <Link to="/Wallet">
-                      <button
-                        onClick={() => {
-                          handleClick1(index);
-                        }}
-                      >
-                        <div className="Notification__Body">
-                          <div className="Notification_Dot"></div>
-                          <div className="NotiText">
-                            <div className="NotiPrice">{Inbox.volume}</div>
-                            <div className="NotiName">{Inbox.message}</div>
-                            <div className="NotiTime">
-                              {get_time(Inbox.created_at)}
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    </Link>
+    <div className="noti-drawer-overlay" onClick={handleClose}>
+      <div className="noti-drawer-panel" onClick={(e) => e.stopPropagation()}>
+        {/* Drawer Header */}
+        <div className="noti-drawer-header">
+          <div className="noti-drawer-title">
+            <i className="bx bx-bell"></i>
+            <span>Notifications</span>
+            {data.length > 0 && (
+              <span className="noti-count-badge">{data.length}</span>
+            )}
+          </div>
+          <button className="noti-close-btn" onClick={handleClose} title="Close Panel">
+            <i className="bx bx-x"></i>
+          </button>
+        </div>
 
-                    <button
-                      className="DeleteButton"
-                      onClick={() => {
-                        del_noti(Inbox.id);
-                      }}
-                    >
-                      -
-                    </button>
+        {/* Filter Tabs & Clear Action */}
+        <div className="noti-toolbar">
+          <div className="noti-tabs">
+            {["All", "Orders", "System"].map((tab) => (
+              <button
+                key={tab}
+                className={`noti-tab ${activeTab === tab ? "active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {data.length > 0 && (
+            <button className="noti-clear-btn" onClick={clearAllNotifications}>
+              Clear All
+            </button>
+          )}
+        </div>
+
+        {/* Notification List */}
+        <div className="noti-list-container">
+          {filteredData.length === 0 ? (
+            <div className="noti-empty-state">
+              <i className="bx bx-bell-off noti-empty-icon"></i>
+              <p className="noti-empty-title">No Notifications</p>
+              <p className="noti-empty-sub">You're all caught up!</p>
+            </div>
+          ) : (
+            filteredData.map((inbox) => (
+              <div key={inbox.id || inbox.created_at} className="noti-card">
+                <Link to="/Wallet" className="noti-card-link" onClick={handleClose}>
+                  <div className="noti-card-icon">
+                    <i
+                      className={`bx ${
+                        inbox.message?.toLowerCase().includes("buy")
+                          ? "bx-trending-up buy"
+                          : inbox.message?.toLowerCase().includes("sell")
+                          ? "bx-trending-down sell"
+                          : "bx-info-circle system"
+                      }`}
+                    ></i>
                   </div>
-                );
-              })
-            : null}
+                  <div className="noti-card-content">
+                    <div className="noti-card-top">
+                      <span className="noti-msg">{inbox.message || "Order Notification"}</span>
+                      <span className="noti-time">{getTime(inbox.created_at)}</span>
+                    </div>
+                    {inbox.volume && (
+                      <div className="noti-vol-tag">
+                        Volume: <strong>{inbox.volume}</strong>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+
+                <button
+                  className="noti-delete-btn"
+                  onClick={(e) => deleteNotification(inbox.id, e)}
+                  title="Dismiss notification"
+                >
+                  <i className="bx bx-trash"></i>
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
@@ -139,3 +161,4 @@ export const Notification = ({ value, hasRefresh }) => {
 };
 
 export default Notification;
+

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "./API/axiosClient";
 
 // Function to set the JWT token in the Authorization header for subsequent requests
 export const setAuthToken = (token) => {

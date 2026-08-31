@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./AnalyticPage.css";
 import Logo from "./Logo.svg";
-import axios from "axios";
+import axios from "../../../API/axiosClient";
 import TableMapping from "./TableMap";
 
 let index = 0;

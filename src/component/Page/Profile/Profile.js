@@ -1,454 +1,323 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./Profile.css";
-import { Link } from "react-router-dom";
-import { value } from "../Navbar/Navbar.js";
-import ApexCharts from "apexcharts";
 import "boxicons/css/boxicons.min.css";
 import AuthContext from "../../../Context/AuthContext";
 import Cookies from "js-cookie";
-import axios from "axios";
+import axios, { clearStoredTokens } from "../../../API/axiosClient";
 import TokenContext from "../../../Context/TokenContext";
 import AccountContext from "../../../Context/AccountContext";
 import LoadingOverlay from "react-loading-overlay";
 
 export const Profile = () => {
-  const Token = React.useContext(TokenContext);
-  const Auth = React.useContext(AuthContext);
-  const Accounts = React.useContext(AccountContext);
-  const [userData, setUserData] = useState([]);
-  const [userAccount, setUserAccount] = useState([]);
+  const Token = useContext(TokenContext);
+  const Auth = useContext(AuthContext);
+  const Accounts = useContext(AccountContext);
+
+  const [userData, setUserData] = useState({});
+  const [userAccount, setUserAccount] = useState({});
   const [userLog, setUserLog] = useState([]);
   const [userTsc, setUserTsc] = useState([]);
-  const [userPort, setUserPort] = useState([]);
-  const [isLoading, setIsloading] = useState(true);
-  let total = 0;
+  const [isLoading, setIsLoading] = useState(true);
 
-  const formatNumber = (Number) => {
-    return Number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+  // Edit Profile Modal States
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editPassword, setEditPassword] = useState("");
+
+  const formatNumber = (num) => {
+    if (num === undefined || num === null) return "0.00";
+    return Number(num).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     const options = {
       year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   const handleClickLogout = () => {
     Auth.setAuth(false);
-    Cookies.remove("token");
+    clearStoredTokens();
     Cookies.remove("account");
     window.location.href = "/";
   };
 
-  const SortedStock = userPort.sort((a, b) => {
-    if (a.market_status === "CLOSE_E") {
-      return b.volume * b.close - a.volume * a.close;
-    } else {
-      return b.volume * b.last_price - a.volume * a.last_price;
-    }
-  });
-
-  const [click, setClick] = useState(false);
-  const handleClick = () => {
-    value.key = 1;
-    setClick(!click);
+  const openEditModal = () => {
+    setEditName(userData.name || "");
+    setEditEmail(userData.email || "");
+    setEditPhone(userData.phone || "");
+    setEditPassword("");
+    setIsEditModalOpen(true);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const palettes = [
-    "#00CB76",
-    "#AD00FF",
-    "#29B1C3",
-    "#424CA0",
-    "#C0A724",
-    "#CD573D",
-    "#B9B9B9",
-  ];
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    const payload = {
+      name: editName,
+      email: editEmail,
+      phone: editPhone,
+    };
+    if (editPassword) {
+      payload.password = editPassword;
+    }
 
-  const chartRef = useRef(null);
-  const colorRef = useRef({});
+    try {
+      await axios.put("/users/update", payload);
+      setUserData((prev) => ({
+        ...prev,
+        name: editName,
+        email: editEmail,
+        phone: editPhone,
+      }));
+      setIsEditModalOpen(false);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Profile update failed", error);
+      alert("Failed to update profile. Please try again.");
+    }
+  };
 
   useEffect(() => {
-    const get_user_info = async () => {
-      await axios
-        .get(`/users/my`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          setUserData(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    };
-
-    const get_account_info = async (e) => {
-      await axios
-        .get(`/account/${e}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          setUserAccount(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-          alert("Please Select Account");
-          Cookies.remove("token");
-          Auth.setAuth(false);
-        });
-    };
-
-    const get_user_log = async () => {
-      await axios
-        .get(`/users/login_info`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          setUserLog(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    };
-
-    const get_tsc = async (account_id) => {
-      await axios
-        .get(`/bank_tsc/my/${account_id}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          setUserTsc(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    };
-
-    const get_portfolio = async (e) => {
-      await axios
-        .get(`/portfolio/${e}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          setUserPort(response.data);
-          setIsloading(false);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    };
-
-    get_user_info();
-    get_account_info(Accounts.account);
-    get_user_log();
-    get_tsc(Accounts.account);
-    get_portfolio(Accounts.account);
-  }, [Accounts.account, Auth, Token.token]);
-
-  useEffect(() => {
-    const series = SortedStock.map((stock) =>
-      parseFloat(
-        stock.volume * (stock.close === 0 ? stock.last_price : stock.close)
-      )
-    );
-    const labels = SortedStock.map((stock) => stock.symbol);
-
-    userPort.forEach((stock, index) => {
-      if (!colorRef.current[stock.symbol]) {
-        colorRef.current[stock.symbol] = palettes[index % palettes.length];
+    const fetchProfileData = async () => {
+      try {
+        const [userRes, logRes] = await Promise.all([
+          axios.get("/users/my"),
+          axios.get("/users/login_info").catch(() => ({ data: [] })),
+        ]);
+        setUserData(userRes.data || {});
+        setUserLog(logRes.data || []);
+      } catch (err) {
+        console.error("Error fetching user data", err);
       }
-    });
-
-    const chartOptions = {
-      chart: {
-        type: "donut",
-      },
-      series: series,
-      labels: labels,
-      colors: userPort.map((stock) => colorRef.current[stock.symbol]),
-      fill: {
-        type: "gradient",
-        gradient: {
-          shade: "dark",
-          type: "vertical",
-          shadeIntensity: 0.7,
-          gradientToColors: ["#282A2E", "#000000"],
-          inverseColors: true,
-          opacityFrom: 1,
-          opacityTo: 1,
-          stops: [0, 100],
-        },
-      },
-      legend: {
-        show: false,
-      },
-      plotOptions: {
-        pie: {
-          donut: {
-            labels: {
-              show: true,
-              name: {
-                fontSize: "120%",
-                offsetY: 0.25,
-                show: true,
-              },
-              value: {
-                fontSize: "80%",
-                color: "#ffffff",
-                offsetY: -0.25,
-                show: true,
-                formatter: (val) => {
-                  return "฿" + formatNumber(Number(val));
-                },
-              },
-            },
-          },
-        },
-      },
     };
 
-    const chart = new ApexCharts(chartRef.current, chartOptions);
-    chart.render();
-
-    setTimeout(() => {
-      setIsloading(false);
-    }, 5000);
-
-    return () => {
-      chart.destroy();
+    const fetchAccountData = async (accId) => {
+      if (!accId) {
+        setIsLoading(false);
+        return;
+      }
+      try {
+        const [accRes, tscRes] = await Promise.all([
+          axios.get(`/account/${accId}`),
+          axios.get(`/bank_tsc/my/${accId}`).catch(() => ({ data: [] })),
+        ]);
+        setUserAccount(accRes.data || {});
+        setUserTsc(tscRes.data || []);
+      } catch (err) {
+        console.error("Error fetching account data", err);
+      } finally {
+        setIsLoading(false);
+      }
     };
-  }, [SortedStock, userPort, palettes]);
+
+    fetchProfileData();
+    fetchAccountData(Accounts?.account);
+  }, [Accounts?.account, Token?.token]);
 
   return (
-    <LoadingOverlay active={isLoading} spinner className="Profile__container">
-      <div className="wallet__container">
-        <div className="balance__container">
-          <div className="balance__title">Your Balance</div>
-          <div className="Donut__Chart" ref={chartRef}>
-            <div className="balance__value__container"></div>
+    <LoadingOverlay active={isLoading} spinner className="profile-page-wrapper">
+      <div className="profile-page-container">
+        {/* Left Column: User Profile & Account Card */}
+        <div className="profile-sidebar-card">
+          <div className="profile-avatar-wrapper">
+            <div className="profile-avatar-icon">
+              <i className="bx bx-user"></i>
+            </div>
+            <div className="profile-verified-badge">
+              <i className="bx bxs-badge-check"></i> Verified
+            </div>
           </div>
-          <div className="balance__container__text">
-            <div className="balance__Total__Wealth">Total Wealth</div>
-            <div className="balance__Total__Wealth__value">
-              {userPort.map((stock) => {
-                total +=
-                  (stock.close === 0 ? stock.last_price : stock.close) *
-                  stock.volume;
-              })}
-              {formatNumber(total)}
-            </div>
-            <div className="THB__Balance">THB</div>
 
-            <div className="balance__Total__Topic">
-              Cash Balance
-              <div className="balance__Total__Cash__Balance__value">
-                {userAccount.id ? (
-                  formatNumber(userAccount.cash_balance)
-                ) : (
-                  <></>
-                )}
-              </div>
-            </div>
+          <h2 className="profile-user-name">{userData.name || "TradeKub User"}</h2>
+          <p className="profile-user-role">Trader / Investor</p>
 
-            <div className="wallet__Line__Available">
-              <div className="balance__Total__Topic">
-                Line Available
-                <div className="wallet__Line__Available__value">
-                  <div>
-                    {userAccount.id ? (
-                      formatNumber(userAccount.line_available)
-                    ) : (
-                      <></>
-                    )}
-                  </div>
-                </div>
-              </div>
+          <div className="profile-info-list">
+            <div className="profile-info-row">
+              <span className="info-label"><i className="bx bx-credit-card-alt"></i> Account ID</span>
+              <span className="info-val">#{userAccount.id || Accounts?.account || "N/A"}</span>
             </div>
-            <div className="Wallet__Creditlimit">
-              <div className="balance__Total__Topic">
-                Credit Limit
-                <div className="wallet__Creditlimit__value">
-                  <div>
-                    {userAccount.id ? (
-                      formatNumber(userAccount.credit_limit)
-                    ) : (
-                      <></>
-                    )}
-                  </div>
-                </div>
-              </div>
+            <div className="profile-info-row">
+              <span className="info-label"><i className="bx bx-briefcase"></i> Broker</span>
+              <span className="info-val">{userAccount.broker_name || "TradeKub Pro"}</span>
             </div>
+            <div className="profile-info-row">
+              <span className="info-label"><i className="bx bx-mail-send"></i> Email</span>
+              <span className="info-val">{userData.email || "N/A"}</span>
+            </div>
+            <div className="profile-info-row">
+              <span className="info-label"><i className="bx bx-phone"></i> Phone</span>
+              <span className="info-val">{userData.phone || "N/A"}</span>
+            </div>
+            <div className="profile-info-row">
+              <span className="info-label"><i className="bx bx-wallet"></i> Cash Balance</span>
+              <span className="info-val green">฿{formatNumber(userAccount.cash_balance)}</span>
+            </div>
+          </div>
 
-            <button className="button__contactBroker">
-              <Link
-                to="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                className="wallet__button__contactBroker"
-                onClick={handleClick}
-              >
-                Contact Broker
-              </Link>
+          <div className="profile-card-actions">
+            <button className="btn-edit-profile" onClick={openEditModal}>
+              <i className="bx bx-edit-alt"></i> Edit Profile
             </button>
-            <div className="wallet__description">
-              Deposit and Withdraw Please contact the Broker
-            </div>
+            <button className="btn-logout" onClick={handleClickLogout}>
+              <i className="bx bx-log-out"></i> Log Out
+            </button>
           </div>
         </div>
-      </div>
 
-      <div className="profile__container__Bank__Transaction__List">
-        <div className="profile__container__Bank__Transaction__Container">
-          <div className="profile__container__Bank__Transaction__BOX">
-            <div className="profile__container__Bank__Transaction__List__title">
-              Bank Transaction List
+        {/* Right Column: Bank Transactions & Security Logins */}
+        <div className="profile-main-content">
+          {/* Bank Transactions Section */}
+          <div className="profile-section-card">
+            <div className="section-card-header">
+              <h3 className="section-card-title">
+                <i className="bx bx-transfer-alt"></i> Bank Transactions
+              </h3>
+              <span className="section-card-badge">{userTsc.length} Transactions</span>
             </div>
-            <div className="profile__container__List__box">
-              {userTsc.map((transaction, index) => (
-                <div className="profile__container__List">
-                  <div
-                    className="profile__container__transaction__item"
-                    key={index}
-                  >
-                    <div className="profile__transaction__details">
+
+            <div className="profile-list-scroll">
+              {userTsc.length === 0 ? (
+                <div className="profile-empty-list">No bank transactions recorded yet.</div>
+              ) : (
+                userTsc.map((tsc, idx) => (
+                  <div key={idx} className="activity-item-row">
+                    <div className="activity-left">
                       <span
-                        className="Wallet__transaction__side"
-                        style={{
-                          color:
-                            transaction.type.toLowerCase() === "deposit"
-                              ? "#42A93C"
-                              : "#CD3D42",
-                        }}
+                        className={`type-tag ${
+                          tsc.type?.toLowerCase() === "deposit" ? "deposit" : "withdraw"
+                        }`}
                       >
-                        {transaction.type.toUpperCase()}
-                      </span>
-                      <span
-                        className="profile__transaction___topic"
-                        style={{ color: "#4E4F51" }}
-                      >
-                        Amount
-                      </span>
-                      <span className="profile__amount__value">
-                        {formatNumber(transaction.amount)}
-                      </span>
-                      <span className="profile__transaction___date">
-                        {formatDate(transaction.timestamp)}
+                        {tsc.type ? tsc.type.toUpperCase() : "TSC"}
                       </span>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="profile__Account___container">
-        <div className="profile__Account__container__box">
-          <div className="profile__Account__container__title">
-            Account Information
-          </div>
-          <div className="profile__Account__ID">
-            Account ID
-            <span className="profile__Account__ID__value">
-              {userAccount.id}
-            </span>
-          </div>
-          <div className="profile__Account__Verified">
-            <div className="CheckVerified" class="bx bxs-badge-check"></div>
-            <span className="VerifiedText">Verified</span>
-          </div>
-
-          <div className="profile__Account__Broker">
-            Broker
-            <span className="profile__Account__Broker__value">
-              {userAccount.broker_name}
-            </span>
-          </div>
-
-          <div className="profile__Account__PersonalInformation">
-            Personal Information
-          </div>
-
-          <div className="profile__Account__Topic">
-            User Name
-            <span className="profile__Account__Name__value">
-              {userData.name}
-            </span>
-          </div>
-
-          <div className="profile__Account__Topic">
-            Phone Number
-            <span className="profile__Account__PhoneNumber__value">
-              {userData.phone}
-            </span>
-          </div>
-          <div className="profile__Account__Topic">
-            Email
-            <span className="profile__Account__Email__value">
-              {userData.email}
-            </span>
-          </div>
-
-          <button className="profile__Account__LogOut">
-            <Link
-              to="/"
-              className="profile__Account__LogOut__button"
-              onClick={handleClickLogout}
-            >
-              Log Out
-            </Link>
-          </button>
-
-          <div className="Login__device">
-            <div className="profile__Account__Topic">Device Log in </div>
-            <div className="Login__device__box">
-              {userLog.map((login, index) => (
-                <div className="Login__device__item__List">
-                  <div className="Login__device__item" key={index}>
-                    <div className="Login__device__item__detail">
-                      <span className="Login__device__item__name">
-                        {login.device}
-                      </span>
-                      <span className="Login__device__IPaddress">
-                        {login.ip}
-                      </span>
-                      <span className="Login__device__date">
-                        {formatDate(login.login)}
-                      </span>
+                    <div className="activity-mid">
+                      <span className="activity-amount">฿{formatNumber(tsc.amount)}</span>
+                    </div>
+                    <div className="activity-right">
+                      <span className="activity-date">{formatDate(tsc.timestamp)}</span>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Security Device Login Log */}
+          <div className="profile-section-card">
+            <div className="section-card-header">
+              <h3 className="section-card-title">
+                <i className="bx bx-devices"></i> Active Login Sessions
+              </h3>
+              <span className="section-card-badge">{userLog.length} Sessions</span>
+            </div>
+
+            <div className="profile-list-scroll">
+              {userLog.length === 0 ? (
+                <div className="profile-empty-list">No device logins recorded.</div>
+              ) : (
+                userLog.map((log, idx) => (
+                  <div key={idx} className="activity-item-row">
+                    <div className="activity-left">
+                      <span className="device-name">
+                        <i className="bx bx-laptop"></i> {log.device || "Browser Session"}
+                      </span>
+                    </div>
+                    <div className="activity-mid">
+                      <span className="ip-address">IP: {log.ip || "127.0.0.1"}</span>
+                    </div>
+                    <div className="activity-right">
+                      <span className="activity-date">{formatDate(log.login)}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {isEditModalOpen && (
+        <div className="profile-modal-overlay" onClick={() => setIsEditModalOpen(false)}>
+          <div className="profile-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="profile-modal-header">
+              <h3><i className="bx bx-user-pin"></i> Edit Account Profile</h3>
+              <button className="modal-close-btn" onClick={() => setIsEditModalOpen(false)}>
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="profile-modal-form">
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Enter full name"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email Address</label>
+                <input
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Phone Number</label>
+                <input
+                  type="text"
+                  value={editPhone}
+                  onChange={(e) => setEditPhone(e.target.value)}
+                  placeholder="Enter phone number"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>New Password (Optional)</label>
+                <input
+                  type="password"
+                  value={editPassword}
+                  onChange={(e) => setEditPassword(e.target.value)}
+                  placeholder="Leave blank to keep current password"
+                />
+              </div>
+
+              <div className="profile-modal-actions">
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-save">
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </LoadingOverlay>
   );
 };
+
+export default Profile;
+

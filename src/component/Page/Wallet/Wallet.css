@@ -1,960 +1,240 @@
+/* Wallet & Portfolio Dashboard Layout */
 .wallet__container {
   width: 100%;
-  height: 100vh;
-  color: #ffffff;
-  justify-content: center;
-  animation: NotiAnimation 1.5s;
+  min-height: calc(100vh - var(--header-height));
+  display: flex;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  overflow: hidden;
 }
 
-@keyframes NotiAnimation {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+.wallet__table__container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 20px;
+  overflow-y: auto;
+  min-width: 0;
 }
 
+.wallet__table__Header {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wallet__table__box {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  width: 100%;
+}
+
+.wallet__table__item {
+  min-width: 240px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.wallet__table__item:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+}
+
+.wallet__table__symbol {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-bright);
+}
+
+.wallet__table__Percent__value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.wallet__table__CAL {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.wallet__table__Topic {
+  color: var(--text-muted);
+}
+
+.wallet__table__button {
+  margin-top: 8px;
+  width: 100%;
+  padding: 8px 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-dark);
+  color: var(--text-bright);
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.wallet__table__button:hover {
+  background-color: var(--accent-cyan);
+  color: #121316;
+  border-color: var(--accent-cyan);
+}
+
+/* Transaction List Section */
+.transaction__list__container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.transaction__list__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.transaction__box {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.transaction__list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.transaction__list:last-child {
+  border-bottom: none;
+}
+
+.transaction__item {
+  color: var(--text-bright);
+  font-weight: 500;
+}
+
+/* Right Balance Summary Panel */
 .balance__container {
-  position: absolute;
-  height: 100vh;
-  right: 0;
-  background-color: #242529;
+  width: 320px;
+  min-width: 280px;
+  background-color: var(--bg-surface);
+  border-left: 1px solid var(--border-color);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
 }
 
 .balance__title {
-  font-weight: 600;
-  color: #ccff00;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
   text-align: center;
-  z-index: 1;
+}
+
+.Donut__Chart {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .balance__container__text {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+  gap: 12px;
 }
 
 .balance__Total__Wealth {
-  font-weight: 600;
-  color: #4e4f51;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .balance__Total__Wealth__value {
-  font-weight: 400;
-  color: #ffffff;
-  text-align: center;
-}
-
-.THB__Balance {
-  font-weight: 400;
-  color: #ffffff;
-  text-align: right;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-green);
 }
 
 .balance__Total__Topic {
-  font-weight: 400;
-  color: #ffffff;
-  text-align: left;
-  display: flex;
-  white-space: nowrap;
-  justify-content: flex-start;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .balance__Total__Cash__Balance__value,
 .wallet__Line__Available__value,
 .wallet__Creditlimit__value {
-  font-weight: 400;
-  color: #ffffff;
-  text-align: right;
-  display: flex;
-  white-space: nowrap;
-  justify-content: flex-end;
+  font-weight: 600;
+  color: var(--text-bright);
 }
 
 .wallet__button__contactBroker {
-  color: #282a2e;
-  background-color: #ccff00;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  padding: 12px 0;
+  background-color: var(--accent-cyan);
+  color: #121316;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
 }
 
-.wallet__table__container {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-}
-.transaction__list__box::-webkit-scrollbar {
-  width: 0px;
-}
-.wallet__table__box::-webkit-scrollbar {
-  height: 4px;
+.wallet__button__contactBroker:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
 }
 
-.transaction__list__box::-webkit-scrollbar-track {
-  background: #212225;
+.wallet__description {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 4px;
 }
 
-.wallet__table__box::-webkit-scrollbar-thumb {
-  background: #282a2e;
-  border-radius: 4px;
-}
-
-.wallet__table__box::-webkit-scrollbar-thumb:hover {
-  background: #4e4f51;
-}
-
-.wallet__table__item {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: #242529;
-  box-shadow: 0px 1px 8px -1px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(20px);
-  border-radius: 50px;
-}
-
-.wallet__table__Topic {
-  font-weight: 400;
-  color: #4e4f51;
-  text-align: left;
-  display: flex;
-  white-space: nowrap;
-  justify-content: flex-start;
-}
-
-.wallet__table__Maket__Value,
-.wallet__table__AVGPurchase__value,
-.wallet__table__totalcost__value,
-.wallet__table__volume__value {
-  font-weight: 400;
-  color: #ffffff;
-  text-align: right;
-  display: flex;
-  white-space: nowrap;
-  justify-content: flex-end;
-}
-
-.wallet__table__UnrealizedPL__value,
-.wallet__table__UnrealizedPLPercent__value {
-  font-weight: 400;
-  display: flex;
-  text-align: right;
-  white-space: nowrap;
-  justify-content: flex-end;
-}
-
-.transaction__list__container {
-  position: absolute;
-  background-color: #212225;
-  z-index: 0;
-  display: flex;
-  justify-content: center;
-}
-
-.wallet__table__Header {
-  position: absolute;
-  font-weight: 600;
-  color: #ccff00;
-}
-
-.transaction__list__title {
-  font-weight: 600;
-  color: #ccff00;
-}
-
-.transaction__list {
-  justify-content: center;
-  background-color: #282a2e;
-}
-
-.transaction__item {
-  font-weight: 400;
-  height: 100%;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-}
-
-.transaction__details {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  text-align: right;
-}
-
-.transaction___topic {
-  text-align: left;
-}
-
-.wallet__table__button:hover {
-  color: #242529;
-  background-color: #ccff00;
-  box-shadow: 0px 1px 16px -1px #ccff00(0, 0, 0, 0.4);
-  transform: translateY(-2px);
-}
-
-.Text__Notraacnsaction{
-  position: absolute;
-}
-
-@media screen and (max-width: 1599px) {
-  .balance__container {
-    width: 30%;
-  }
-
-  .balance__title {
-    padding-top: 1.5rem;
-    font-size: 0.85rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .Donut__Chart {
-    width: 20rem;
-    height: auto;
-    margin: auto;
-    border: none;
-    outline: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: -1;
-  }
-
-  .balance__container__text {
-    margin-top: 1rem;
-  }
-
-  .balance__Total__Wealth {
-    font-size: 0.85rem;
-  }
-
-  .balance__Total__Wealth__value {
-    padding-top: 0.5rem;
-    font-size: 1rem;
-    width: 14rem;
-  }
-
-  .THB__Balance {
-    font-size: 1rem;
-    width: 14rem;
-    margin-top: -1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .balance__Total__Topic {
-    font-size: 0.85rem;
-    width: 14rem;
-  }
-
-  .balance__Total__Cash__Balance__value,
-  .wallet__Line__Available__value,
-  .wallet__Creditlimit__value {
-    font-size: 0.85rem;
-    width: 14rem;
-  }
-
-  .wallet__table__container {
-    height: 100vh;
-    width: 70%;
-  }
-
-  .wallet__button__contactBroker {
-    width: 14rem;
-    height: 2.25rem;
-    margin-top: 3rem;
-    border-radius: 10rem;
-    font-size: 0.85rem;
-  }
-
-  .wallet__button__contactBroker:hover {
-    background-color: #ccff00;
-    box-shadow: 0px 1px 16px -1px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-  }
-
-  .wallet__description {
-    color: #4e4f51;
-    font-size: 0.58rem;
-    margin-top: 0.5rem;
-  }
-
-  .wallet__table__Header {
-    width: 48rem;
-    margin-left: 2.5rem;
-    padding-top: 1.5rem;
-    padding-left: 1rem;
-    text-align: left;
-    font-size: 0.85rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .wallet__table__box {
-    overflow-x: auto;
-    width: 48rem;
-    height: 15.5rem;
-    margin-left: 2.5rem;
-    margin-top: 3.5rem;
-    display: flex;
-  }
-
-  .wallet__table__item {
-    border-radius: 15px;
-    width: 15rem;
-    height: 14.5rem;
-    margin-right: 1.5rem;
-  }
-
-  .wallet__table__CAL {
-    width: 15rem;
-  }
-
-  .wallet__table__color {
-    position: absolute;
-    top: 1.25rem;
-    left: 1rem;
-    width: 0.25rem;
-    height: 2rem;
-    border-radius: 15px 15px 15px 15px;
-  }
-
-  .wallet__table__symbol {
-    margin-top: 0.5rem;
-    font-weight: 600;
-    font-size: 1rem;
-    width: 11.5rem;
-    text-align: left;
-  }
-
-  .wallet__table__Percent {
-    color: #4e4f51;
-    font-weight: 400;
-    font-size: 0.75rem;
-    width: 11.5rem;
-    text-align: right;
-    margin-top: -2rem;
-  }
-
-  .wallet__table__Percent__value {
-    height: 1.25rem;
-    color: #ffffff;
-    font-size: 0.75rem;
-    width: 3.5rem;
-    text-align: right;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-    border-radius: 6px;
-  }
-
-  .wallet__table__Topic {
-    font-size: 0.65rem;
-    width: 11.5rem;
-  }
-
-  .wallet__table__Maket__Value,
-  .wallet__table__AVGPurchase__value,
-  .wallet__table__totalcost__value,
-  .wallet__table__volume__value,
-  .wallet__table__UnrealizedPL__value,
-  .wallet__table__UnrealizedPL__value,
-  .wallet__table__UnrealizedPLPercent__value {
-    font-size: 0.75rem;
-    width: 11.5rem;
-  }
-
-  .wallet__table__button {
-    margin-top: 1rem;
-    color: #ffffff;
-    width: 8rem;
-    height: 2rem;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(
-      126.59deg,
-      rgba(255, 255, 255, 0.08) 12.11%,
-      rgba(255, 255, 255, 0.02) 73.08%
-    );
-    box-shadow: 0px 1px 8px -1px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(20px);
-    border-radius: 50px;
-  }
-
-  .transaction__list__container {
-    bottom: 0;
-    width: 70%;
-  }
-
-  .transaction__list__title {
-    margin-left: 2.5rem;
-    padding-top: 1rem;
-    padding-left: 1.25rem;
-    text-align: left;
-    font-size: 0.85rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .transaction__box {
-    width: 51rem;
-    height: 18rem;
-  }
-
-  .transaction__list__box {
-    margin-left: 2.5rem;
-    overflow-y: auto;
-    max-height: 13.5rem;
-  }
-
-  .transaction__list {
-    margin-top: 0.5rem;
-    border-radius: 10rem;
-    width: 100%;
-    height: 2.15rem;
-  }
-
-  .transaction__item {
-    font-size: 0.65rem;
-  }
-
-  .transaction__side {
-    padding-left: 1.5rem;
-    width: 2rem;
-  }
-
-  .transaction__symbol {
-    width: 3rem;
-  }
-
-  .transaction__volume {
-    width: 3rem;
-  }
-
-  .transaction__price {
-    width: 3rem;
-  }
-
-  .transaction__total {
-    width: 4rem;
-  }
-
-  .transaction__date {
-    width: 12rem;
-    padding-right: 1.5rem;
-  }
-}
-
-@media screen and (min-width: 1600px) and (max-width: 1800px) {
-  .wallet__table__box::-webkit-scrollbar {
-    height: 5px;
+@media (max-width: 1000px) {
+  .wallet__container {
+    flex-direction: column;
   }
   .balance__container {
-    width: 30%;
-  }
-
-  .balance__title {
-    padding-top: 2rem;
-    font-size: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .Donut__Chart {
-    width: 23rem;
-    height: auto;
-    margin: auto;
-    border: none;
-    outline: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: -10;
-  }
-
-
-  .balance__container__text {
-    margin-top: 1.5rem;
-  }
-
-  .balance__Total__Wealth {
-    font-size: 1rem;
-  }
-
-  .balance__Total__Wealth__value {
-    padding-top: 0.5rem;
-    font-size: 1rem;
-    width: 17rem;
-  }
-
-  .THB__Balance {
-    font-size: 1rem;
-    width: 17rem;
-    margin-top: -1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .balance__Total__Topic {
-    font-size: 1rem;
-    padding-top: 0.3rem;
-    width: 17rem;
-  }
-
-  .balance__Total__Cash__Balance__value,
-  .wallet__Line__Available__value,
-  .wallet__Creditlimit__value {
-    font-size: 1rem;
-    width: 17rem;
-  }
-
-  .wallet__table__container {
-    height: 100vh;
-    width: 70%;
-  }
-
-  .wallet__button__contactBroker {
-    width: 17rem;
-    height: 2.5rem;
-    margin-top: 2.5rem;
-    border-radius: 10rem;
-    font-size: 1rem;
-  }
-
-  .wallet__button__contactBroker:hover {
-    background-color: #ccff00;
-    box-shadow: 0px 1px 16px -1px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-  }
-
-  .wallet__description {
-    color: #4e4f51;
-    font-size: 0.65rem;
-    margin-top: 0.5rem;
-  }
-
-  .wallet__table__Header {
-    width: 52rem;
-    margin-left: 3rem;
-    padding-top: 2rem;
-    padding-left: 1rem;
-    text-align: left;
-    font-size: 1rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .wallet__table__box {
-    overflow-x: auto;
-    width: 52rem;
-    height: 18rem;
-    margin-left: 5rem;
-    margin-top: 5rem;
-    display: flex;
-  }
-
-  .wallet__table__item {
-    border-radius: 15px;
-    width: 16rem;
-    height: 16rem;
-    margin-right: 2rem;
-  }
-
-  .wallet__table__CAL {
-    width: 16rem;
-  }
-
-  .wallet__table__color {
-    position: absolute;
-    top: 1.75rem;
-    left: 1.25rem;
-    width: 0.25rem;
-    height: 2rem;
-    border-radius: 15px 15px 15px 15px;
-  }
-
-  .wallet__table__symbol {
-    margin-top: 0.5rem;
-    font-weight: 600;
-    font-size: 1rem;
-    width: 12rem;
-    text-align: left;
-  }
-
-  .wallet__table__Percent {
-    color: #4e4f51;
-    font-weight: 400;
-    font-size: 1rem;
-    width: 12rem;
-    text-align: right;
-    margin-top: -2rem;
-  }
-
-  .wallet__table__Percent__value {
-    height: 1.25rem;
-    color: #ffffff;
-    font-size: 0.75rem;
-    width: 3.5rem;
-    text-align: right;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-    border-radius: 6px;
-  }
-
-  .wallet__table__Topic {
-    font-size: 0.65rem;
-    width: 12rem;
-  }
-
-  .wallet__table__Maket__Value,
-  .wallet__table__AVGPurchase__value,
-  .wallet__table__totalcost__value,
-  .wallet__table__volume__value,
-  .wallet__table__UnrealizedPL__value,
-  .wallet__table__UnrealizedPL__value,
-  .wallet__table__UnrealizedPLPercent__value {
-    font-size: 0.75rem;
-    width: 12rem;
-  }
-
-  .wallet__table__button {
-    margin-top: 1rem;
-    color: #ffffff;
-    width: 8rem;
-    height: 2rem;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(
-      126.59deg,
-      rgba(255, 255, 255, 0.08) 12.11%,
-      rgba(255, 255, 255, 0.02) 73.08%
-    );
-    box-shadow: 0px 1px 8px -1px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(20px);
-    border-radius: 50px;
-  }
-
-  .transaction__list__container {
-    bottom: 0;
-    width: 70%;
-  }
-
-  .transaction__list__title {
-    margin-left: 2.5rem;
-    padding-top: 2rem;
-    padding-left: 1.25rem;
-    text-align: left;
-    font-size: 0.85rem;
-    padding-bottom: 1rem;
-  }
-
-  .transaction__box {
-    width: 55rem;
-    height: 23rem;
-  }
-
-  .transaction__list__box {
-    margin-left: 2.5rem;
-    overflow-y: auto;
-    max-height: 16rem;
-  }
-
-  .transaction__list {
-    margin-top: 0.5rem;
-    border-radius: 10rem;
     width: 100%;
-    height: 2.15rem;
-  }
-
-  .transaction__item {
-    font-size: 0.65rem;
-  }
-
-  .transaction__side {
-    padding-left: 2rem;
-    width: 2rem;
-  }
-
-  .transaction__symbol {
-    width: 3rem;
-  }
-
-  .transaction__volume {
-    width: 3rem;
-  }
-
-  .transaction__price {
-    width: 3rem;
-  }
-
-  .transaction__total {
-    width: 4rem;
-  }
-
-  .transaction__date {
-    width: 12rem;
-    padding-right: 2rem;
+    border-left: none;
+    border-top: 1px solid var(--border-color);
   }
 }
 
-@media screen and (min-width: 1801px) {
-  .wallet__table__box::-webkit-scrollbar {
-    height: 6px;
-  }
-  .balance__container {
-    width: 30%;
-  }
 
-  .balance__title {
-    padding-top: 3.5rem;
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-  }
-
-  .Donut__Chart {
-    width: 25rem;
-    height: auto;
-    margin: auto;
-    border: none;
-    outline: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: -1;
-  }
-
-
-  .balance__container__text {
-    margin-top: 1.5rem;
-  }
-
-  .balance__Total__Wealth {
-    font-size: 1.25rem;
-  }
-
-  .balance__Total__Wealth__value {
-    padding-top: 0.5rem;
-    font-size: 1.25rem;
-    width: 18rem;
-  }
-
-  .THB__Balance {
-    font-size: 1.25rem;
-    width: 18rem;
-    margin-top: -1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .balance__Total__Topic {
-    font-size: 1.25rem;
-    padding-top: 0.3rem;
-    width: 18rem;
-  }
-
-  .balance__Total__Cash__Balance__value,
-  .wallet__Line__Available__value,
-  .wallet__Creditlimit__value {
-    font-size: 1.25rem;
-    width: 18rem;
-  }
-
-  .wallet__table__container {
-    height: 100vh;
-    width: 70%;
-  }
-
-  .wallet__button__contactBroker {
-    width: 18rem;
-    height: 2.5rem;
-    margin-top: 2.5rem;
-    border-radius: 10rem;
-    font-size: 1.25rem;
-  }
-
-  .wallet__button__contactBroker:hover {
-    background-color: #ccff00;
-    box-shadow: 0px 1px 16px -1px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-  }
-
-  .wallet__description {
-    color: #4e4f51;
-    font-size: 0.7rem;
-    margin-top: 0.5rem;
-  }
-
-  .wallet__table__Header {
-    width: 60rem;
-    margin-left: 3.5rem;
-    padding-top: 3.5rem;
-    padding-left: 1.25rem;
-    text-align: left;
-    font-size: 1.25rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .wallet__table__box {
-    overflow-x: auto;
-    width: 60rem;
-    height: 19rem;
-    margin-left: 5rem;
-    margin-top: 6.5rem;
-    display: flex;
-  }
-
-  .wallet__table__item {
-    border-radius: 15px;
-    width: 18rem;
-    height: 18rem;
-    margin-right: 2.25rem;
-  }
-
-  .wallet__table__CAL {
-    width: 18rem;
-  }
-
-  .wallet__table__color {
-    position: absolute;
-    top: 2rem;
-    left: 1.25rem;
-    width: 0.25rem;
-    height: 2rem;
-    border-radius: 15px 15px 15px 15px;
-  }
-
-  .wallet__table__symbol {
-    margin-top: 0.5rem;
-    font-weight: 600;
-    font-size: 1.25rem;
-    width: 14rem;
-    text-align: left;
-  }
-
-  .wallet__table__Percent {
-    color: #4e4f51;
-    font-weight: 400;
-    font-size: 1rem;
-    width: 14rem;
-    text-align: right;
-    margin-top: -2rem;
-  }
-
-  .wallet__table__Percent__value {
-    height: 1.25rem;
-    color: #ffffff;
-    font-size: 0.75rem;
-    width: 3.5rem;
-    text-align: right;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-    border-radius: 6px;
-  }
-
-  .wallet__table__Topic {
-    font-size: 0.75rem;
-    padding-top: 0.25rem;
-    width: 14rem;
-  }
-
-  .wallet__table__Maket__Value,
-  .wallet__table__AVGPurchase__value,
-  .wallet__table__totalcost__value,
-  .wallet__table__volume__value,
-  .wallet__table__UnrealizedPL__value,
-  .wallet__table__UnrealizedPL__value,
-  .wallet__table__UnrealizedPLPercent__value {
-    font-size: 0.75rem;
-    width: 14rem;
-  }
-
-  .wallet__table__button {
-    margin-top: 1rem;
-    color: #ffffff;
-    width: 10rem;
-    height: 2rem;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(
-      126.59deg,
-      rgba(255, 255, 255, 0.08) 12.11%,
-      rgba(255, 255, 255, 0.02) 73.08%
-    );
-    box-shadow: 0px 1px 8px -1px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(20px);
-    border-radius: 50px;
-  }
-
-  .transaction__list__container {
-    bottom: 0;
-    width: 70%;
-  }
-
-  .transaction__list__title {
-    margin-left: 2.5rem;
-    padding-top: 2rem;
-    padding-left: 1.25rem;
-    text-align: left;
-    font-size: 1.25rem;
-    padding-bottom: 1rem;
-  }
-
-  .transaction__box {
-    width: 62rem;
-    height: 30rem;
-  }
-
-  .transaction__list__box {
-    margin-left: 2.5rem;
-    overflow-y: auto;
-    max-height: 21rem;
-  }
-
-  .transaction__list {
-    margin-top: 0.5rem;
-    border-radius: 10rem;
-    width: 100%;
-    height: 2.5rem;
-  }
-
-  .transaction__item {
-    font-size: 0.75rem;
-  }
-
-  .transaction__side {
-    padding-left: 2.5rem;
-    width: 2rem;
-  }
-
-  .transaction__symbol {
-    width: 3rem;
-  }
-
-  .transaction__volume {
-    width: 3rem;
-  }
-
-  .transaction__price {
-    width: 3rem;
-  }
-
-  .transaction__total {
-    width: 4rem;
-  }
-
-  .transaction__date {
-    width: 13rem;
-    padding-right: 2.5rem;
-  }
-}

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import axios from "axios";
+import axios from "../../../API/axiosClient";
 import TableMapping from "./TableMap";
 function Goverment() {
   const [data, setData] = React.useState([]);

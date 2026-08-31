@@ -11,9 +11,8 @@ import s8 from "./imgStone/stone 8.svg";
 import s9 from "./imgStone/stone 9.svg";
 import s10 from "./imgStone/stone 10.svg";
 import creditcard from "./imgStone/Credit cards.svg";
-import axios from "axios";
+import axios from "../../../API/axiosClient";
 
-axios.defaults.baseURL = "https://tradekub.me";
 
 const Register = () => {
   const [inputBorderColor1, setInputBorderColor1] = useState("");
@@ -178,9 +177,8 @@ const Register = () => {
         className="stone1"
         style={{
           pointerEvents: "none",
-          transform: `translate(${stoneOffset.offsetX * 60}px, ${
-            stoneOffset.offsetY * 60
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 60}px, ${stoneOffset.offsetY * 60
+            }px)`,
         }}
       >
         <img src={s1} alt="Stone" className="stone-image" />
@@ -188,9 +186,8 @@ const Register = () => {
       <div
         className="stone2"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 30}px, ${
-            stoneOffset.offsetY * 30
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 30}px, ${stoneOffset.offsetY * 30
+            }px)`,
         }}
       >
         <img src={s2} alt="Stone" className="stone-image" />
@@ -198,9 +195,8 @@ const Register = () => {
       <div
         className="stone3"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 20}px, ${
-            stoneOffset.offsetY * 20
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 20}px, ${stoneOffset.offsetY * 20
+            }px)`,
         }}
       >
         <img src={s3} alt="Stone" className="stone-image" />
@@ -208,9 +204,8 @@ const Register = () => {
       <div
         className="stone4"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 15}px, ${
-            stoneOffset.offsetY * 15
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 15}px, ${stoneOffset.offsetY * 15
+            }px)`,
         }}
       >
         <img src={s4} alt="Stone" className="stone-image" />
@@ -218,9 +213,8 @@ const Register = () => {
       <div
         className="stone5"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 15}px, ${
-            stoneOffset.offsetY * 15
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 15}px, ${stoneOffset.offsetY * 15
+            }px)`,
         }}
       >
         <img src={s5} alt="Stone" className="stone-image" />
@@ -228,9 +222,8 @@ const Register = () => {
       <div
         className="stone6"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 10}px, ${
-            stoneOffset.offsetY * 10
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 10}px, ${stoneOffset.offsetY * 10
+            }px)`,
         }}
       >
         <img src={s6} alt="Stone" className="stone-image" />
@@ -238,9 +231,8 @@ const Register = () => {
       <div
         className="stone7"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 15}px, ${
-            stoneOffset.offsetY * 15
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 15}px, ${stoneOffset.offsetY * 15
+            }px)`,
         }}
       >
         <img src={s7} alt="Stone" className="stone-image" />
@@ -248,9 +240,8 @@ const Register = () => {
       <div
         className="stone8"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 10}px, ${
-            stoneOffset.offsetY * 10
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 10}px, ${stoneOffset.offsetY * 10
+            }px)`,
         }}
       >
         <img src={s8} alt="Stone" className="stone-image" />
@@ -258,9 +249,8 @@ const Register = () => {
       <div
         className="stone9"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 15}px, ${
-            stoneOffset.offsetY * 15
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 15}px, ${stoneOffset.offsetY * 15
+            }px)`,
         }}
       >
         <img src={s9} alt="Stone" className="stone-image" />
@@ -268,9 +258,8 @@ const Register = () => {
       <div
         className="stone10"
         style={{
-          transform: `translate(${stoneOffset.offsetX * 10}px, ${
-            stoneOffset.offsetY * 10
-          }px)`,
+          transform: `translate(${stoneOffset.offsetX * 10}px, ${stoneOffset.offsetY * 10
+            }px)`,
         }}
       >
         <img src={s10} alt="Stone" className="stone-image" />

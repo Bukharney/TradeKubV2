@@ -1,115 +1,292 @@
-.Notification {
+/* Right Slide-over Notification Drawer */
+.noti-drawer-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  animation: NotiAnimation 0.3s;
-  z-index: 1000;
-}
-
-@keyframes NotiAnimation {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.Notication__Box {
+  width: 100vw;
   height: 100vh;
-  background: #242529;
-  box-shadow: 5px 0px 20px rgba(0, 0, 0, 0.25);
-  width: 15rem;
+  background: rgba(19, 20, 23, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeIn 0.25s ease-out;
 }
 
-.Nofitication__Header {
-  text-align: left;
-  color: #ccff00;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.noti-drawer-panel {
+  width: 380px;
+  height: 100%;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  animation: slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideLeft {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* Header */
+.noti-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.noti-drawer-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.noti-drawer-title i {
+  color: var(--accent-cyan);
+  font-size: 1.3rem;
+}
+
+.noti-count-badge {
+  background: var(--accent-cyan);
+  color: #121316;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.noti-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.noti-close-btn:hover {
+  color: var(--text-bright);
+  background: var(--bg-card-hover);
+}
+
+/* Toolbar & Tabs */
+.noti-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg-dark);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.noti-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.noti-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
   font-weight: 600;
-  padding-top: 1.5rem;
-  margin-left: 1.5rem;
-  width: 12rem;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.Notification__Body {
-  background: #1a1b1e;
-  height: 5.7rem;
-  width: 15rem;
-  margin-bottom: 0.5rem;
+.noti-tab:hover {
+  color: var(--text-bright);
+  background: var(--bg-card-hover);
 }
 
-.Notification_Item {
-  font-weight: 400;
-  font-size: 0.6rem;
-  color: #ffffff;
+.noti-tab.active {
+  background: var(--bg-card);
+  color: var(--accent-cyan);
+  border-color: var(--border-color);
 }
 
-.Notification_Dot {
-  background-color: #ccff00;
-  position: absolute;
-  margin-top: 2.6rem;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  margin-left: 2rem;
-}
-
-.NotiText {
-  text-align: left;
-  align-items: left;
-  padding-top: 1rem;
-  margin-left: 5rem;
-}
-
-.NotiPrice {
+.noti-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
   font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-.Notification__Button:hover {
-  transform: translateY(-1px);
+.noti-clear-btn:hover {
+  color: var(--accent-red);
 }
 
-.DeleteButton {
-  position: absolute;
-  color: #4e4f51;
-  margin-left: -1.15rem;
-  font-size: 1rem;
-  margin-top: 0.25rem;
+/* List Container */
+.noti-list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.DeleteButton:hover {
-  color: #cd3d42;
-}
-
-.Notification {
-  margin-left: 2.5rem;
-}
-
-.TextNonoti {
-  color: #d9d9d9;
-  font-size: 0.8rem;
-  margin-left: 1.5rem;
-  margin-top: 1rem;
-  border-top: 1px solid #4e4f51;
-  padding-top: 0.5rem;
-  width: 12rem;
+/* Empty State */
+.noti-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
   text-align: center;
 }
 
-@media screen and (min-width: 1600px) and (max-width: 1800px) {
-  .Notification__Container {
-    margin-left: 3rem;
-  }
+.noti-empty-icon {
+  font-size: 3rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
 }
 
-@media screen and (min-width: 1801px) {
-  .Notification__Container {
-    margin-left: 3.5rem;
-  }
+.noti-empty-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 4px;
 }
+
+.noti-empty-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Notification Card */
+.noti-card {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  gap: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.noti-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  transform: translateX(-2px);
+}
+
+.noti-card-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+.noti-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.noti-card-icon i.buy {
+  color: var(--accent-green);
+}
+
+.noti-card-icon i.sell {
+  color: var(--accent-red);
+}
+
+.noti-card-icon i.system {
+  color: var(--accent-cyan);
+}
+
+.noti-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.noti-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.noti-msg {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-bright);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.noti-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.noti-vol-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.noti-vol-tag strong {
+  color: var(--accent-cyan);
+}
+
+.noti-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
+  transition: all 0.2s;
+}
+
+.noti-card:hover .noti-delete-btn {
+  opacity: 1;
+}
+
+.noti-delete-btn:hover {
+  color: var(--accent-red);
+}
+

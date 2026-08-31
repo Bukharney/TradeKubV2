@@ -1,6 +1,6 @@
 //ดึงข้อมูลทุกแถวของแต่ละ Table ลงนี่เลย เดะ query ใน databaseTable.js เอา
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import axiosClient from "../../../API/axiosClient";
 import TokenContext from "../../../Context/TokenContext";
 
 export let UserData = [
@@ -306,13 +306,8 @@ export const AllDataUpdate = () => {
   let [NewsDataServer, setNews] = useState([]);
 
   const Get_user_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/users/`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/users/`)
       .then((response) => {
         console.log(response.data);
         setUser(response.data);
@@ -323,13 +318,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_account_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/account/all`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/account/all`)
       .then((response) => {
         console.log(response.data);
         setAccount(response.data);
@@ -340,13 +330,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_broker_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/broker/`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/broker/`)
       .then((response) => {
         console.log(response.data);
         setBroker(response.data);
@@ -357,13 +342,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_banktrans_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/bank_tsc/`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/bank_tsc/`)
       .then((response) => {
         console.log(response.data);
         setBankTrans(response.data);
@@ -374,13 +354,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_StockOrder_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/order/all`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/order/all`)
       .then((response) => {
         console.log(response.data);
         setOrder(response.data);
@@ -391,13 +366,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_StockTrans_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/stock/transactions/all`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/stock/transactions/all`)
       .then((response) => {
         console.log(response.data);
         setStockTrans(response.data);
@@ -408,13 +378,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_LoginLogout_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/users/login_info/all`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/users/login_info/all`)
       .then((response) => {
         console.log(response.data);
         setLoginout(response.data);
@@ -425,13 +390,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_Company_data = async () => {
-    await axios
-      .get("https://www.tradekub.me/stock/company_info/all", {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get("/stock/company_info/all")
       .then((response) => {
         console.log(response.data);
         setCompany(response.data);
@@ -442,13 +402,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_Turnover_data = async () => {
-    await axios
-      .get("https://www.tradekub.me/turnover/all", {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get("/turnover/all")
       .then((response) => {
         console.log(response.data);
         setTurnover(response.data);
@@ -459,13 +414,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_Divident_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/dividend/`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/dividend/`)
       .then((response) => {
         console.log(response.data);
         setDivident(response.data);
@@ -476,13 +426,8 @@ export const AllDataUpdate = () => {
   };
 
   const Get_News_data = async () => {
-    await axios
-      .get(`https://www.tradekub.me/news/`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+    await axiosClient
+      .get(`/news/`)
       .then((response) => {
         console.log(response.data);
         setNews(response.data);

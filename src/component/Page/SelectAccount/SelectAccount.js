@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
 import "./SelectAcc.css";
-import axios from "axios";
+import axios from "../../../API/axiosClient";
 import TokenContext from "../../../Context/TokenContext";
 import AccountContext from "../../../Context/AccountContext";
 import Logo from "./Logo.svg";
 import Cookies from "js-cookie";
 
-axios.defaults.baseURL = "https://tradekub.me";
 
 export const SelectAccount = () => {
   const [data, setData] = useState([]);
@@ -49,12 +48,7 @@ export const SelectAccount = () => {
     const get_account = async () => {
       console.log("Token.token", Token.token);
       await axios
-        .get(`/account/my`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
+        .get(`/account/my`)
         .then((response) => {
           console.log(response.data);
           setData(response.data);

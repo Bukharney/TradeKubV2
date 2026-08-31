@@ -3,7 +3,7 @@ import "./Market.css";
 import CandleChart from "./CandleChart";
 import CandleChart2 from "./CandleChart2";
 import CandleChart3 from "./CandleChart3";
-import axios from "axios";
+import axios from "../../../API/axiosClient";
 import TokenContext from "../../../Context/TokenContext";
 import AccountContext from "../../../Context/AccountContext";
 import { NumericFormat, PatternFormat } from "react-number-format";
@@ -11,7 +11,14 @@ import LoadingOverlay from "react-loading-overlay";
 import PopUP from "./PopUP";
 import { cancelOrder, placeOrder } from "../../../API/API";
 
-axios.defaults.baseURL = "https://tradekub.me";
+
+const INTERVAL_PRESETS = [
+  { label: "1D", interval: "5m", period: "1d", limit: 60 },
+  { label: "5D", interval: "1h", period: "5d", limit: 100 },
+  { label: "1M", interval: "1d", period: "1mo", limit: 100 },
+  { label: "3M", interval: "1d", period: "3mo", limit: 100 },
+  { label: "1Y", interval: "1wk", period: "1y", limit: 100 },
+];
 
 export const Market = () => {
   const Token = useContext(TokenContext);
@@ -34,6 +41,41 @@ export const Market = () => {
   const [isLoadingGraph, setIsLoadingGraph] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState("");
+  const [selectedInterval, setSelectedInterval] = useState("1M");
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [modalSearchTerm, setModalSearchTerm] = useState("");
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setIsSearchModalOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, []);
+
+  const handleIntervalChange = async (preset) => {
+    setSelectedInterval(preset.label);
+    setIsLoadingGraph(true);
+    try {
+      const limitVal = preset.limit || 100;
+      const response = await axios.get(
+        `/stock/market/${symbol}/${preset.interval}/${limitVal}?period=${preset.period}`
+      );
+      if (response.data) {
+        setMarketData((prev) => ({
+          ...(typeof prev === "object" ? prev : {}),
+          candlestick_50limit: response.data.candlestick_50limit || response.data,
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingGraph(false);
+    }
+  };
 
   const totalPrice = Number(Price) * Number(Volume);
 
@@ -126,12 +168,7 @@ export const Market = () => {
 
   const get_search_stock = async (symbol) => {
     await axios
-      .get(`/stock/search/${symbol}`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
+      .get(`/stock/search/${symbol}`)
       .then((response) => {
         console.log(response.data);
         setUserSearch([...response.data, ...userSearch]);
@@ -150,14 +187,9 @@ export const Market = () => {
 
   useEffect(() => {
     setIsLoadingGraph(true);
-    const get_market_data = async (symbol) => {
+    const get_market_data = async (sym) => {
       await axios
-        .get(`/stock/market_data/${symbol}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
+        .get(`/stock/market_data/${sym}`)
         .then((response) => {
           console.log(response.data);
           setMarketData(response.data);
@@ -166,17 +198,14 @@ export const Market = () => {
         })
         .catch((error) => {
           console.error(error);
+          setIsLoadingGraph(false);
+          setIsloading(false);
         });
     };
 
     const get_account_info = async (e) => {
       await axios
-        .get(`/account/${e}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
+        .get(`/account/${e}`)
         .then((response) => {
           console.log(response.data);
           setUserAccount(response.data);
@@ -188,12 +217,7 @@ export const Market = () => {
 
     const get_order = async (e) => {
       await axios
-        .get(`/order/${e}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
+        .get(`/order/${e}`)
         .then((response) => {
           console.log(response.data);
           setUserOrder(response.data);
@@ -204,21 +228,14 @@ export const Market = () => {
     };
 
     get_order(Account.account);
-    setTimeout(() => {
-      get_market_data(symbol);
-    }, 5000);
+    get_market_data(symbol);
     get_account_info(Account.account);
   }, [Account.account, symbol, Token.token]);
 
   useEffect(() => {
     const get_stock = async () => {
       await axios
-        .get(`/stock/`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
+        .get(`/stock/`)
         .then((response) => {
           console.log(response.data);
           setUserStock(response.data);
@@ -239,67 +256,27 @@ export const Market = () => {
     );
   }
 
+  const availableStocksList = userStock.length > 0 ? userStock : userSearch;
+  const filteredStocks = availableStocksList.filter((stk) =>
+    stk.symbol.toLowerCase().includes(modalSearchTerm.toLowerCase())
+  );
+
   return (
     <div className="Market__container">
-      <div className="Market__container__left">
-        <div className="Market__container__left__serch">
-          <div className="Market__container__left__serch__input">
-            <div className="srch__icon">
-              <i class="bx bx-search"></i>
-            </div>
-            <div className="Market__container__left__serch__input__box">
-              <input
-                type="text"
-                placeholder="Search symbols"
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="Market__container__left__stock">
-          <div className="Market__container__left__stock__Box">
-            {userSearch.map((stock, index) => (
-              <button key={index} onClick={() => handleSelectStock(index)}>
-                <div className="Martket__left_div">
-                  <div className="Market__container__left__stock__Box__stock__symbol">
-                    {stock.symbol}
-                  </div>
-                  <div className="Market__container__left__stock__Box__stock__lastPrice">
-                    Last Price
-                    <div
-                      className="Market__container__left__stock__Box__stock__lastPrice__value"
-                      style={{
-                        color: stock.change >= 0 ? "#42A93C" : "#CD3D42",
-                      }}
-                    >
-                      {stock.close.toFixed(2)}
-                    </div>
-                  </div>
-                  <div className="Market__container__left__stock__Box__stock__percentChange">
-                    Change
-                    <div
-                      className="Market__container__left__stock__Box__stock__percentChange__value"
-                      style={{
-                        color: stock.change >= 0 ? "#42A93C" : "#CD3D42",
-                      }}
-                    >
-                      {stock.change > 0
-                        ? `+${stock.change.toFixed(2)}`
-                        : `${stock.change.toFixed(2)}`}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
       <div className="Market__container__mid">
         <div className="Market__container__mid__header">
           <div className="Market__container__mid__header__left">
             <div className="Market__container__symbol">
               <div className="Market__stock__symbol">Symbol</div>
-              <div className="Market__stock__symbol__value">{symbol}</div>
+              <button
+                className="Market__symbol__select__btn"
+                onClick={() => setIsSearchModalOpen(true)}
+                title="Click or press Ctrl+K to change stock symbol"
+              >
+                <span>{symbol}</span>
+                <i className="bx bx-search-alt-2"></i>
+                <kbd className="Market__kbd__hint">Ctrl+K</kbd>
+              </button>
             </div>
             <div className="Market__container__last_Price">
               <div className="Market__stock__Last_Price">last Price</div>
@@ -307,18 +284,12 @@ export const Market = () => {
                 className="Market__stock__Last_Price__value"
                 style={{
                   color:
-                    (marketData.quote_symbol.percentChange
-                      ? marketData.quote_symbol.percentChange
-                      : 0) >= 0
+                    ((marketData?.price_info?.change ?? marketData?.quote_symbol?.percentChange) || 0) >= 0
                       ? "#42A93C"
                       : "#CD3D42",
                 }}
               >
-                {formatNumber(
-                  marketData.quote_symbol.last
-                    ? marketData.quote_symbol.last
-                    : 0
-                )}
+                {formatNumber(marketData?.price_info?.last ?? marketData?.quote_symbol?.last ?? 0)}
               </div>
             </div>
           </div>
@@ -330,25 +301,19 @@ export const Market = () => {
                   className="Market__stock__CHG__value"
                   style={{
                     color:
-                      marketData.quote_symbol.change >= 0
+                      ((marketData?.price_info?.change ?? marketData?.quote_symbol?.change) || 0) >= 0
                         ? "#42A93C"
                         : "#CD3D42",
                   }}
                 >
-                  {formatNumber(
-                    marketData.quote_symbol.percentChange
-                      ? marketData.quote_symbol.percentChange
-                      : 0
-                  )}
+                  {formatNumber(marketData?.price_info?.change ?? marketData?.quote_symbol?.percentChange ?? 0)}
                 </div>
               </div>
               <div className="Market__container__volume">
                 <div className="Market__stock__volume">Bid Volume</div>
                 <div className="Market__stock__volume__value">
                   {formatNumber(
-                    marketData.bid_offer.bid_volume1
-                      ? Number(marketData.bid_offer.bid_volume1)
-                      : 0
+                    Number(marketData?.bid_offer?.bid_volume1 || 0)
                   )}
                 </div>
               </div>
@@ -358,18 +323,12 @@ export const Market = () => {
                   className="Market__stock__Bid_Price__value"
                   style={{
                     color:
-                      (marketData.quote_symbol.percentChange
-                        ? marketData.quote_symbol.percentChange
-                        : 0) >= 0
+                      ((marketData?.price_info?.change ?? marketData?.quote_symbol?.percentChange) || 0) >= 0
                         ? "#42A93C"
                         : "#CD3D42",
                   }}
                 >
-                  {formatNumber(
-                    marketData.bid_offer.bid_price1
-                      ? marketData.bid_offer.bid_price1
-                      : 0
-                  )}
+                  {formatNumber(marketData?.bid_offer?.bid_price1 || 0)}
                 </div>
               </div>
               <div className="Market__container__Offer_Price">
@@ -378,36 +337,26 @@ export const Market = () => {
                   className="Market__stock__Offer_Price__value"
                   style={{
                     color:
-                      (marketData.quote_symbol.percentChange
-                        ? marketData.quote_symbol.percentChange
-                        : 0) >= 0
+                      ((marketData?.price_info?.change ?? marketData?.quote_symbol?.percentChange) || 0) >= 0
                         ? "#42A93C"
                         : "#CD3D42",
                   }}
                 >
-                  {formatNumber(
-                    marketData.bid_offer.ask_price1
-                      ? marketData.bid_offer.ask_price1
-                      : 0
-                  )}
+                  {formatNumber(marketData?.bid_offer?.ask_price1 || 0)}
                 </div>
               </div>
               <div className="Market__container__offer_volume">
                 <div className="Market__stock__offer_volume">Offer Volume</div>
                 <div className="Market__stock__offer_volume__value">
                   {formatNumber(
-                    Number(
-                      marketData.bid_offer.ask_volume1
-                        ? marketData.bid_offer.ask_volume1
-                        : 0
-                    )
+                    Number(marketData?.bid_offer?.ask_volume1 || 0)
                   )}
                 </div>
               </div>
               <div className="Market__container__total_volume">
                 <div className="Market__stock__total_volume">Total Volume</div>
                 <div className="Market__stock__total_volume__value">
-                  {marketData.quote_symbol.totalVolume.toLocaleString()}
+                  {Number(marketData?.price_info?.total_volume ?? marketData?.quote_symbol?.totalVolume ?? 0).toLocaleString()}
                 </div>
               </div>
             </div>
@@ -422,9 +371,7 @@ export const Market = () => {
                 color: "#42A93C",
               }}
             >
-              {formatNumber(
-                marketData.quote_symbol.high ? marketData.quote_symbol.high : 0
-              )}
+              {formatNumber(marketData?.price_info?.high ?? marketData?.quote_symbol?.high ?? 0)}
             </span>
             <span className="Market__stock__Low">Low</span>
             <span
@@ -433,9 +380,7 @@ export const Market = () => {
                 color: "#CD3D42",
               }}
             >
-              {formatNumber(
-                marketData.quote_symbol.low ? marketData.quote_symbol.low : 0
-              )}
+              {formatNumber(marketData?.price_info?.low ?? marketData?.quote_symbol?.low ?? 0)}
             </span>
             <span className="Market__stock__Open">Ceiling</span>
             <span
@@ -445,8 +390,8 @@ export const Market = () => {
               }}
             >
               {formatNumber(
-                marketData.candlestick_1limit.open[0]
-                  ? marketData.candlestick_1limit.open[0] * 1.3
+                (marketData?.price_info?.open ?? marketData?.candlestick_1limit?.open?.[0])
+                  ? (marketData?.price_info?.open ?? marketData.candlestick_1limit.open[0]) * 1.3
                   : 0
               )}
             </span>
@@ -458,28 +403,34 @@ export const Market = () => {
               }}
             >
               {formatNumber(
-                marketData.candlestick_1limit.open[0]
-                  ? marketData.candlestick_1limit.open[0] * 0.7
+                (marketData?.price_info?.open ?? marketData?.candlestick_1limit?.open?.[0])
+                  ? (marketData?.price_info?.open ?? marketData.candlestick_1limit.open[0]) * 0.7
                   : 0
               )}
             </span>
             <span className="Market__stock__Average">Average</span>
             <span className="Market__stock__Average__value">
-              {formatNumber(
-                marketData.quote_symbol.average
-                  ? marketData.quote_symbol.average
-                  : 0
-              )}
+              {formatNumber(marketData?.price_info?.last ?? marketData?.quote_symbol?.average ?? 0)}
             </span>
             <sapn className="Market__stock__Close">Close</sapn>
             <span className="Market__stock__Close__value">
               {formatNumber(
-                marketData.candlestick_1limit.close[0]
-                  ? marketData.candlestick_1limit.close[0]
-                  : 0
+                marketData?.price_info?.close ?? marketData?.candlestick_1limit?.close?.[0] ?? 0
               )}
             </span>
           </div>
+        </div>
+        <div className="Market__chart__toolbar">
+          {INTERVAL_PRESETS.map((preset) => (
+            <button
+              key={preset.label}
+              className={`Market__chart__interval__btn ${selectedInterval === preset.label ? "active" : ""
+                }`}
+              onClick={() => handleIntervalChange(preset)}
+            >
+              {preset.label}
+            </button>
+          ))}
         </div>
         <LoadingOverlay
           active={isLoadingGraph}
@@ -497,15 +448,22 @@ export const Market = () => {
             },
           }}
         >
-          {window.innerWidth <= 1599 && (
-            <CandleChart data={marketData.candlestick_50limit} height="100%" />
-          )}
-          {window.innerWidth >= 1600 && window.innerWidth <= 1800 && (
-            <CandleChart2 data={marketData.candlestick_50limit} height="100%" />
-          )}
-          {window.innerWidth >= 1801 && (
-            <CandleChart3 data={marketData.candlestick_50limit} height="100%" />
-          )}
+          {(() => {
+            const chartData = marketData?.candlestick_50limit || (marketData?.close ? marketData : null);
+            return (
+              <>
+                {window.innerWidth <= 1599 && (
+                  <CandleChart data={chartData} interval={selectedInterval} height="100%" />
+                )}
+                {window.innerWidth >= 1600 && window.innerWidth <= 1800 && (
+                  <CandleChart2 data={chartData} interval={selectedInterval} height="100%" />
+                )}
+                {window.innerWidth >= 1801 && (
+                  <CandleChart3 data={chartData} interval={selectedInterval} height="100%" />
+                )}
+              </>
+            );
+          })()}
         </LoadingOverlay>
         <div className="Market__container__mid__Footer">
           <div className="Market__container__mid__Footer__width">
@@ -621,9 +579,8 @@ export const Market = () => {
               <div className="Market__Footer__Order">
                 <div className="Market__Footer__Order__div">
                   <div
-                    className={`Market__Footer__Buy ${
-                      selectedOption === "Buy" ? "active" : ""
-                    }`}
+                    className={`Market__Footer__Buy ${selectedOption === "Buy" ? "active" : ""
+                      }`}
                     onClick={() => handleOptionClick("Buy")}
                   >
                     <button
@@ -633,9 +590,8 @@ export const Market = () => {
                     </button>
                   </div>
                   <div
-                    className={`Market__Footer__Sell ${
-                      selectedOption === "Sell" ? "active" : ""
-                    }`}
+                    className={`Market__Footer__Sell ${selectedOption === "Sell" ? "active" : ""
+                      }`}
                     onClick={() => handleOptionClick("Sell")}
                   >
                     <button
@@ -734,13 +690,12 @@ export const Market = () => {
                         <button
                           onClick={
                             stock.status === "C"
-                              ? () => {}
+                              ? () => { }
                               : () => togglePopup(stock)
                           }
                           key={index}
-                          className={`Market__container__right__Container__box2 ${
-                            selectedStock === stock ? "selected" : ""
-                          }`}
+                          className={`Market__container__right__Container__box2 ${selectedStock === stock ? "selected" : ""
+                            }`}
                         >
                           <div className="Market__container__right__status__Symbol">
                             {stock.symbol}
@@ -780,6 +735,61 @@ export const Market = () => {
           </div>
         </div>
       </div>
+
+      {isSearchModalOpen && (
+        <div className="Market__search__modal__overlay" onClick={() => setIsSearchModalOpen(false)}>
+          <div className="Market__search__modal__content" onClick={(e) => e.stopPropagation()}>
+            <div className="Market__search__modal__header">
+              <div className="Market__search__modal__input__wrap">
+                <i className="bx bx-search"></i>
+                <input
+                  type="text"
+                  placeholder="Search stock symbol (e.g. KBANK, DELTA, PTT...)"
+                  value={modalSearchTerm}
+                  onChange={(e) => setModalSearchTerm(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <button
+                className="Market__search__modal__close"
+                onClick={() => setIsSearchModalOpen(false)}
+              >
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
+
+            <div className="Market__search__modal__body">
+              <div className="Market__search__modal__subtitle">Select a Stock Symbol</div>
+              <div className="Market__search__modal__grid">
+                {filteredStocks.map((stk, idx) => (
+                  <div
+                    key={idx}
+                    className={`Market__search__modal__item ${stk.symbol === symbol ? "active" : ""}`}
+                    onClick={() => {
+                      setSymbol(stk.symbol);
+                      setIsSearchModalOpen(false);
+                      setModalSearchTerm("");
+                    }}
+                  >
+                    <div className="Market__search__modal__item__sym">{stk.symbol}</div>
+                    <div className="Market__search__modal__item__right">
+                      <div className="Market__search__modal__item__price">
+                        {stk.close ? stk.close.toFixed(2) : stk.price ? stk.price.toFixed(2) : "--"}
+                      </div>
+                      <div
+                        className="Market__search__modal__item__chg"
+                        style={{ color: (stk.change || 0) >= 0 ? "#42A93C" : "#CD3D42" }}
+                      >
+                        {(stk.change || 0) > 0 ? `+${stk.change.toFixed(2)}` : (stk.change || 0).toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,7 +3,7 @@ import "./Wallet.css";
 import { Link } from "react-router-dom";
 import { value } from "../Navbar/Navbar.js";
 import ApexCharts from "apexcharts";
-import axios from "axios";
+import axios from "../../../API/axiosClient";
 import TokenContext from "../../../Context/TokenContext";
 import AccountContext from "../../../Context/AccountContext";
 import LoadingOverlay from "react-loading-overlay";
@@ -64,12 +64,7 @@ export const Wallet = () => {
   useEffect(() => {
     const get_portfolio = async (e) => {
       await axios
-        .get(`/portfolio/${e}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
+        .get(`/portfolio/${e}`)
         .then((response) => {
           console.log(response.data);
           setUserPort(response.data);
@@ -84,12 +79,7 @@ export const Wallet = () => {
 
     const get_account_info = async (e) => {
       await axios
-        .get(`/account/${e}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
+        .get(`/account/${e}`)
         .then((response) => {
           console.log(response.data);
           setUserAccount(response.data);
@@ -101,12 +91,7 @@ export const Wallet = () => {
 
     const get_account_tsc = async (e) => {
       await axios
-        .get(`/stock/transactions/${e}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: "Bearer " + Token.token,
-          },
-        })
+        .get(`/stock/transactions/${e}`)
         .then((response) => {
           console.log(response.data);
           setUserTsc(response.data);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Navbar } from "./component/Page/Navbar/Navbar";
+import { HeaderBar } from "./component/Page/Navbar/HeaderBar";
 import { Login } from "./component/Page/Login/Login";
 import { Home } from "./component/Page/Homepage/Home";
 import { Market } from "./component/Page/Market/Market";
@@ -18,19 +19,119 @@ import Register from "./component/Page/Register/Register";
 import { View } from "./component/Page/View/View";
 
 import { AnalyticPage } from "./component/Page/AnalyticPage/AnalyticPage";
-import { AccountManagement } from "./component/Page/AccountManagement/AccountManagement";
-import { NewsManagement } from "./component/Page/NewsManagement/NewsManagement";
-import { BankTransactionManagement } from "./component/Page/BankTransactionManagement/BankTransactionManagement";
 import { SelectAccount } from "./component/Page/SelectAccount/SelectAccount";
-import { StockTransactionManagement } from "./component/Page/StockTransactionManagement/StockTransactionManagement";
-import { DividentManagement } from "./component/Page/DividentManagement/DividentManagement";
-
-import axios from "axios";
+import axios, { getStoredToken, clearStoredTokens } from "./API/axiosClient";
 import EditUser from "./component/Page/EditUserProfile/EditUser";
-import { PortfolioManagement } from "./component/Page/PortfolioManagement/PortfolioManagement";
-import { BrokerManagement } from "./component/Page/BrokerManagement/BrokerManagement";
 
-axios.defaults.baseURL = "https://tradekub.bukharney.site";
+
+function AppShell({ auth }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const location = useLocation();
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => !prev);
+  };
+
+  const currentPath = location.pathname.toLowerCase();
+  const isStandalone = [
+    "/",
+    "/login",
+    "/register",
+    "/selectaccount",
+  ].some((path) => currentPath === path || currentPath === path + "/");
+
+  return (
+    <div className={`app-shell ${isStandalone ? "standalone" : ""}`}>
+      {!isStandalone && (
+        <HeaderBar
+          sidebarCollapsed={sidebarCollapsed}
+          toggleSidebar={toggleSidebar}
+        />
+      )}
+      <div className="app-body">
+        {!isStandalone && <Navbar collapsed={sidebarCollapsed} />}
+        <div className="app-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/Login"
+              element={auth ? <Navigate to="/SelectAccount" replace /> : <Login />}
+            />
+            <Route
+              path="/Register"
+              element={auth ? <Navigate to="/SelectAccount" replace /> : <Register />}
+            />
+            <Route
+              path="/Market"
+              element={
+                <ProtectedRoute>
+                  <Market />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Wallet"
+              element={
+                <ProtectedRoute>
+                  <Wallet />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/News"
+              element={
+                <ProtectedRoute>
+                  <News />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Notification"
+              element={
+                <ProtectedRoute>
+                  <Notification />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/View" element={<View />} />
+            <Route
+              path="/AnalyticPage"
+              element={
+                <ProtectedRoute>
+                  <AnalyticPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/SelectAccount"
+              element={
+                <ProtectedRoute>
+                  <SelectAccount />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/EditUser"
+              element={
+                <ProtectedRoute>
+                  <EditUser />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [auth, setAuth] = useState(false);
@@ -39,26 +140,23 @@ function App() {
   const [isLoading, setLoading] = useState(true);
 
   const readCookie = async () => {
-    let token = Cookies.get("token");
+    let token = getStoredToken();
     let account = Cookies.get("account");
     if (token) {
       setAccount(account);
       setToken(token);
       setAuth(true);
       await axios
-        .get("/users/token", {
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        .get("/account/my")
         .then((response) => {
           console.log(response);
         })
         .catch((error) => {
           console.error(error);
-          Cookies.remove("token");
-          setAuth(false);
+          if (error?.response?.status === 401) {
+            clearStoredTokens();
+            setAuth(false);
+          }
         });
       console.log("readCookie");
       console.log(token);
@@ -83,158 +181,7 @@ function App() {
       <TokenContext.Provider value={{ token, setToken }}>
         <AccountContext.Provider value={{ account, setAccount }}>
           <Router>
-            <Navbar />
-            <div>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                {!auth ? (
-                  <>
-                    <Route path="/Login" element={<Login />} />
-                    <Route path="/Register" element={<Register />} />
-                  </>
-                ) : (
-                  () => window.location.replace("/Market")
-                )}
-                <Route
-                  path="/Market"
-                  element={
-                    <ProtectedRoute>
-                      <Market />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/Wallet"
-                  element={
-                    <ProtectedRoute>
-                      <Wallet />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/News"
-                  element={
-                    <ProtectedRoute>
-                      <News />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/Notification"
-                  element={
-                    <ProtectedRoute>
-                      <Notification />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/Profile"
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/View" element={<View />} />
-                <Route
-                  path="/AnalyticPage"
-                  element={
-                    <ProtectedRoute>
-                      <AnalyticPage />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/AccountManagement"
-                  element={
-                    <ProtectedRoute>
-                      <AccountManagement />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/NewsManagement"
-                  element={
-                    <ProtectedRoute>
-                      <NewsManagement />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/BankTransactionManagement"
-                  element={
-                    <ProtectedRoute>
-                      <BankTransactionManagement />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/DividentManagement"
-                  element={
-                    <ProtectedRoute>
-                      <DividentManagement />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/StockTransactionManagement"
-                  element={
-                    <ProtectedRoute>
-                      <StockTransactionManagement />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/SelectAccount"
-                  element={
-                    <ProtectedRoute>
-                      <SelectAccount />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/Register"
-                  element={
-                    <ProtectedRoute>
-                      <Register />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/EditUser"
-                  element={
-                    <ProtectedRoute>
-                      <EditUser />
-                    </ProtectedRoute>
-                  }
-                />
-
-                <Route
-                  path="/PortfolioManagement"
-                  element={
-                    <ProtectedRoute>
-                      <PortfolioManagement />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/BrokerManagement"
-                  element={
-                    <ProtectedRoute>
-                      <BrokerManagement />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </div>
+            <AppShell auth={auth} />
           </Router>
         </AccountContext.Provider>
       </TokenContext.Provider>

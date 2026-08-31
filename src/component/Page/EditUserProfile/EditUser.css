@@ -1,192 +1,86 @@
-.AllsectionEditUser {
+/* Edit User Profile Page */
+.edit-user-page-wrapper {
   width: 100%;
-  height: 100vh;
-  color: #ffffff;
+  min-height: calc(100vh - var(--header-height));
+  background-color: var(--bg-dark);
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
+  padding: 32px;
 }
 
-.boxEditUser {
-  width: 20%;
-  height: 48%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 5%;
-}
-
-.Head-Text-EditUser {
-  font-weight: 600;
+.edit-user-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  max-width: 480px;
   width: 100%;
+  padding: 32px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.edit-user-header {
   text-align: center;
-  font-size: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.TextUsernameEditUser {
+.edit-user-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--bg-dark);
+  border: 1px solid var(--accent-cyan);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: var(--accent-cyan);
+  margin-bottom: 12px;
+}
+
+.edit-user-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.edit-user-header p {
   font-size: 0.85rem;
-  align-items: center;
-  width: 100%;
-  text-align: center;
-  justify-content: center;
-  margin: 5%;
-  margin-bottom: 5%;
+  color: var(--text-muted);
 }
 
-.TextBoxInsertEditUser1,
-.TextBoxInsertEditUser2,
-.TextBoxInsertEditUser3,
-.TextBoxInsertEditUser4,
-.TextBoxInsertEditUser5 {
-  border: 1px solid #4e4f51;
-  background-color: #282a2e;
-  color: #ffffff;
-  width: 90%;
-  height: 10%;
-  border-radius: 5px;
-  margin-top: 5%;
+.edit-user-form {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  outline: none;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.TextBoxInsertEditUser1 input,
-.TextBoxInsertEditUser2 input,
-.TextBoxInsertEditUser3 input,
-.TextBoxInsertEditUser4 input {
-  background-color: transparent;
-  font-size: 0.65rem;
-  color: #ffffff;
-  width: 90%;
-  height: 70%;
-  outline: none;
-  padding-top: 1%;
-  padding-bottom: 1%;
-}
-
-.CancelConfirm-Edit {
-  width: 90%;
-  height: 15%;
-  margin-top: 5%;
+.edit-user-actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-.EditCancel {
-  width: 48%;
-  height: 80%;
-  border-radius: 5px;
-  background-color: #282a2e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  border: 1px solid #4e4f51;
-  font-weight: 600;
+.btn-confirm {
+  flex: 1;
+  background: var(--accent-cyan);
+  color: #121316;
+  font-weight: 700;
+  padding: 10px 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.EditCancel:hover {
-  background-color: #4e4f51;
-  transform: translateY(-2px);
+.btn-confirm:hover {
+  filter: brightness(1.15);
 }
 
-.EditConfirm {
-  width: 48%;
-  height: 80%;
-  border-radius: 5px;
-  background: #ccff00;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #282a2e;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.EditConfirm:hover {
-  transform: translateY(-2px);
-}
-
-.EditDeleteAcc {
-  width: 100%;
-  height: 90%;
-  font-weight: 600;
-  margin-bottom: 10%;
-  border-radius: 5px;
-  background-color: #282a2e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  border: 1px solid #4e4f51;
-}
-
-.EditDeleteAcc:hover {
-  background-color: #cd3d42;
-  transform: translateY(-2px);
-}
-
-.creditcardSSSS {
-  z-index: -2;
-  width: 26%;
-  position: absolute;
-}
-
-@media screen and (min-width: 1600px) and (max-width: 1800px) {
-  .Head-Text-EditUser {
-    margin-top: 5%;
-    font-size: 1.5rem;
-  }
-
-  .TextUsernameEditUser {
-    font-size: 1rem;
-  }
-
-  .TextBoxInsertEditUser1 input,
-  .TextBoxInsertEditUser2 input,
-  .TextBoxInsertEditUser3 input,
-  .TextBoxInsertEditUser4 input {
-    font-size: 1rem;
-  }
-
-  .EditCancel,
-  .EditDeleteAcc {
-    font-size: 1rem;
-  }
-
-  .EditConfirm {
-    font-size: 1rem;
-  }
-}
-
-@media screen and (min-width: 1801px) {
-  .Head-Text-EditUser {
-    margin-top: 5%;
-    font-size: 1.6rem;
-  }
-  .TextUsernameEditUser {
-    font-size: 1rem;
-  }
-
-  .TextBoxInsertEditUser1 input,
-  .TextBoxInsertEditUser2 input,
-  .TextBoxInsertEditUser3 input,
-  .TextBoxInsertEditUser4 input {
-    font-size: 1rem;
-  }
-
-  .EditCancel,
-  .EditDeleteAcc {
-    font-size: 1rem;
-  }
-
-  .EditConfirm {
-    font-size: 1rem;
-  }
-}

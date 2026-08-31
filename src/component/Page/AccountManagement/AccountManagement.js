@@ -1,552 +1,400 @@
-import React, { useContext, useState } from "react";
-import "./AccountManagement.css"; // Import the CSS file for additional styles
-import axios from "axios";
+import React, { useContext, useState, useEffect } from "react";
+import "./AccountManagement.css";
+import axios from "../../../API/axiosClient";
 import TokenContext from "../../../Context/TokenContext";
 
-axios.defaults.baseURL = "http://localhost:8000";
-
 export const AccountManagement = () => {
-  const [selectedButton, setSelectedButton] = useState("Add"); // Initial selection is 'Add'
-  const [InputBox0, setInputBox0] = useState("");
-  const [InputBox1, setInputBox1] = useState("");
-  const [InputBox2, setInputBox2] = useState("");
-  const [InputBox3, setInputBox3] = useState("");
-  const [InputBox4, setInputBox4] = useState("");
-  const [InputBox5, setInputBox5] = useState("");
+  const [selectedButton, setSelectedButton] = useState("Add");
+  const [brokerId, setBrokerId] = useState("1");
+  const [accountIdOrUser, setAccountIdOrUser] = useState("");
+  const [pin, setPin] = useState("");
+  const [cashBalance, setCashBalance] = useState("");
+  const [lineAvailable, setLineAvailable] = useState("");
+  const [creditLimit, setCreditLimit] = useState("");
 
+  const [accountList, setAccountList] = useState([]);
+  const [searchFilter, setSearchFilter] = useState("");
   const Token = useContext(TokenContext);
-  let retreiveValue = [{}];
+
+  const fetchAccountList = async () => {
+    try {
+      const response = await axios.get("/account/");
+      setAccountList(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch accounts list", error);
+      // Fallback
+      setAccountList([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchAccountList();
+  }, [Token.token]);
 
   const handleReset = () => {
-    setInputBox1("");
-    setInputBox2("");
-    setInputBox3("");
-    setInputBox4("");
-    setInputBox5("");
+    setAccountIdOrUser("");
+    setPin("");
+    setCashBalance("");
+    setLineAvailable("");
+    setCreditLimit("");
   };
 
-  const handleButtonClick = (buttonName) => {
-    setSelectedButton(buttonName);
-    setInputBox1("");
-    setInputBox2("");
-    setInputBox3("");
-    setInputBox4("");
-    setInputBox5("");
+  const handleTabChange = (tab) => {
+    setSelectedButton(tab);
+    handleReset();
   };
 
-  // Function to handle input change
-  const handleInputChange0 = (event) => {
-    setInputBox0(event.target.value);
+  const handleSelectTableRow = (acc) => {
+    setSelectedButton("Edit");
+    setBrokerId(String(acc.broker_id || "1"));
+    setAccountIdOrUser(String(acc.id || ""));
+    setCashBalance(String(acc.cash_balance || 0));
+    setLineAvailable(String(acc.line_available || 0));
+    setCreditLimit(String(acc.credit_limit || 0));
   };
 
-  const handleInputChange1 = (event) => {
-    setInputBox1(event.target.value);
-  };
-  const handleInputChange2 = (event) => {
-    setInputBox2(event.target.value);
-  };
-  const handleInputChange3 = (event) => {
-    setInputBox3(event.target.value);
-  };
-  const handleInputChange4 = (event) => {
-    setInputBox4(event.target.value);
-  };
-  const handleInputChange5 = (event) => {
-    setInputBox5(event.target.value);
-  };
+  const handleSubmitAdd = async (e) => {
+    e.preventDefault();
+    if (!pin || pin.length !== 6 || isNaN(pin)) {
+      alert("PIN must be exactly 6 digits.");
+      return;
+    }
 
-  const BrokerExist = async (b) => {
     try {
-      const response = await axios.get(`/broker/${b}`, {
-        headers: {
-          accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      });
+      // First get user ID
+      const userRes = await axios.get(`/users/username/${accountIdOrUser}`);
+      const userId = userRes.data?.id;
+      if (!userId) {
+        alert("User not found!");
+        return;
+      }
 
-      console.log(response.data);
-      return 1; // Resolving the Promise with the desired value
-    } catch (error) {
-      console.error(error);
-      return 0; // Resolving the Promise with the desired value
+      const payload = {
+        user_id: Number(userId),
+        broker_id: Number(brokerId),
+        cash_balance: 0,
+        line_available: 0,
+        credit_limit: Number(creditLimit || 0),
+        pin: Number(pin),
+      };
+
+      await axios.post("/account/", payload);
+      alert("Account created successfully!");
+      handleReset();
+      fetchAccountList();
+    } catch (err) {
+      console.error(err);
+      alert("Create account failed. Please check your inputs.");
     }
   };
 
-  const UserExist = async (u) => {
+  const handleSubmitEdit = async (e) => {
+    e.preventDefault();
+    if (!accountIdOrUser) {
+      alert("Please enter an Account ID.");
+      return;
+    }
+
     try {
-      const response = await axios.get(`/users/username/${u}`, {
-        headers: {
-          accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      });
-      console.log(response.data);
-      return 1; // Resolving the Promise with the desired value
-    } catch (error) {
-      console.error(error);
-      return 0; // Resolving the Promise with the desired value
+      // Fetch current account data
+      const currentAcc = await axios.get(`/account/${accountIdOrUser}`);
+      const accData = currentAcc.data || {};
+
+      const payload = {
+        user_id: accData.user_id,
+        broker_id: Number(brokerId || accData.broker_id),
+        cash_balance: cashBalance !== "" ? Number(cashBalance) : accData.cash_balance,
+        line_available: lineAvailable !== "" ? Number(lineAvailable) : accData.line_available,
+        credit_limit: creditLimit !== "" ? Number(creditLimit) : accData.credit_limit,
+        pin: pin !== "" ? Number(pin) : accData.pin,
+      };
+
+      await axios.put(`/account/${accountIdOrUser}`, payload);
+      alert("Account updated successfully!");
+      handleReset();
+      fetchAccountList();
+    } catch (err) {
+      console.error(err);
+      alert("Update failed. Please check Account ID.");
     }
   };
 
-  const Get_user_data = async (u) => {
-    await axios
-      .get(`/users/username/${u}`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        retreiveValue = response.data;
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+  const handleSubmitDelete = async (e) => {
+    e.preventDefault();
+    if (!accountIdOrUser) {
+      alert("Please enter an Account ID.");
+      return;
+    }
 
-  const Get_account_data = async (a) => {
-    await axios
-      .get(`/account/${a}`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        retreiveValue = response.data;
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
+    if (!window.confirm(`Are you sure you want to delete Account #${accountIdOrUser}?`)) {
+      return;
+    }
 
-  const AccountExist = async (b) => {
     try {
-      const response = await axios.get(`/account/${b}`, {
-        headers: {
-          accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      });
-
-      console.log(response);
-      return 1; // Resolving the Promise with the desired value
-    } catch (error) {
-      console.error(error);
-      return 0; // Resolving the Promise with the desired value
+      await axios.delete(`/account/${accountIdOrUser}`);
+      alert("Account deleted successfully!");
+      handleReset();
+      fetchAccountList();
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed. Account not found.");
     }
   };
 
-  const CreateAccount = async ({ InputBox0, InputBox2, InputBox3 }) => {
-    const data = {
-      user_id: Number(retreiveValue.id),
-      broker_id: Number(InputBox0),
-      cash_balance: 0,
-      line_available: 0,
-      credit_limit: Number(InputBox3),
-      pin: Number(InputBox2),
-    };
-
-    await axios
-      .post("/account/", data, {
-        headers: {
-          accep: "application/json",
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        alert("Create account successfull");
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error(error.data);
-        alert("Create account failed please try again");
-      });
-  };
-
-  const UpdateAccount = async (b) => {
-    const data = {
-      user_id: retreiveValue.user_id,
-      broker_id: retreiveValue.broker_id,
-      cash_balance: retreiveValue.cash_balance,
-      line_available: retreiveValue.line_available,
-      credit_limit: retreiveValue.credit_limit,
-      pin: retreiveValue.pin,
-    };
-
-    if (InputBox2 !== "") {
-      data.pin = Number(InputBox2);
-    } // ยัด InputBox2 อัพเดทค่า pin ของ accountID}
-    if (InputBox3 !== "") {
-      data.cash_balance = Number(InputBox3);
-    } // ยัด InputBox3 อัพเดทค่า cash balance ของ accountID}
-    if (InputBox4 !== "") {
-      data.line_available = Number(InputBox4);
-    } // ยัด InputBox4 อัพเดทค่า line available ของ accountID}
-    if (InputBox5 !== "") {
-      data.credit_limit = Number(InputBox5);
-    } // ยัด InputBox5 อัพเดทค่า credit limit ของ accountID
-
-    await axios
-      .put(`/account/${InputBox1}`, data, {
-        headers: {
-          accep: "application/json",
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.error(error.data);
-        alert("Update account balance failed please try again");
-        window.location.reload();
-      });
-  };
-
-  const DeleteAccoount = async (a) => {
-    await axios
-      .delete(`/account/${a}`, {
-        headers: {
-          accept: "application/json",
-          Authorization: "Bearer " + Token.token,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  // Function to handle form submission
-  const handleSubmit1 = (event) => {
-    event.preventDefault();
-
-    (async () => {
-      if ((await BrokerExist(InputBox0)) === 0) {
-        alert("Cannot find your broker ID");
-        window.location.reload();
-      } else if ((await UserExist(InputBox1)) === 0) {
-        alert("Cannot find the username");
-        window.location.reload();
-      } else if (
-        isNaN(InputBox2) ||
-        !Number.isInteger(Number(InputBox2)) ||
-        InputBox2.length !== 6
-      ) {
-        alert("Wrong format of pin");
-        window.location.reload();
-      } else if (isNaN(InputBox3)) {
-        alert("Wrong format of credit limit");
-        window.location.reload();
-      } else {
-        await Get_user_data(InputBox1).then(() => {
-          CreateAccount({ InputBox0, InputBox2, InputBox3 });
-        });
-        //
-      }
-    })();
-
-    /*
-       if(InputBox0 ไม่เจอใน databases)
-       {
-           alert('Cannot find your broker ID')
-           window.location.reload();
-
-       }
-       else if(InputBox1 ไม่เจอใน database){
-           alert('Cannot find the username')
-           window.location.reload();
-       }
-       else if(isNaN(InputBox2) || !Number.isInteger(InputBox2) || InputBox2.length !== 6)
-       {
-           alert('Wrong format of pin')
-           window.location.reload();
-       }
-       else if(isNaN(InputBox3))
-       {
-           alert('Wrong format of credit limit')
-           window.location.reload();
-       }
-       else{ // เตรียมยัดข้อมูลตรงนี้}
-       InputBox1 //username สำหรับสร้าง account ของ user เพิ่ม โดยมี InputBox0 คือ broker
-       InputBox2 //pin
-       InputBox3 //credit limit
-       //******************** ADD*/
-    // window.location.reload();
-  };
-  const handleSubmit2 = (event) => {
-    event.preventDefault();
-    (async () => {
-      await Get_account_data(InputBox1);
-      if ((await BrokerExist(InputBox0)) === 0) {
-        alert("Cannot find your broker ID");
-        window.location.reload();
-      } else if ((await AccountExist(Number(InputBox1))) === 0) {
-        alert("Cannot find the Account");
-        window.location.reload();
-      } else if (retreiveValue.broker_id !== Number(InputBox0)) {
-        alert("the account isn't belong to your broker");
-        window.location.reload();
-      } else if (
-        InputBox2 !== "" &&
-        (isNaN(InputBox2) ||
-          !Number.isInteger(Number(InputBox2)) ||
-          InputBox2.length !== 6)
-      ) {
-        alert("Wrong format of pin");
-        window.location.reload();
-      } else if (InputBox3 !== "" && isNaN(InputBox3)) {
-        alert("Wrong format of credit limit");
-        window.location.reload();
-      } else if (InputBox4 !== "" && isNaN(InputBox4)) {
-        alert("Wrong format of line available");
-        window.location.reload();
-      } else if (InputBox5 !== "" && isNaN(InputBox5)) {
-        alert("Wrong format of credit limit");
-        window.location.reload();
-      } else {
-        await UpdateAccount();
-        window.location.reload();
-      }
-    })();
-
-    // Perform any necessary actions with the input value
-    /*
-         if(InputBox1 ไม่เจอใน database){
-            alert('Cannot find the account id')
-            window.location.reload();
-        }
-        else if(InputBox1(account) มี แต่ broker_id ไม่ตรงกับ InputBox0 (broker ID))
-        {
-            alert('the account isn't belong to your broker')
-            window.location.reload();
- 
-        }
-        else if(isNaN(InputBox2) || !Number.isInteger(์NumberInputBox2) || InputBox2.length !== 6)
-        {
-            alert('Wrong format of pin')
-            window.location.reload();
-        }
-        else if(isNaN(InputBox3))
-        {
-            alert('Wrong format of cash balance')
-            window.location.reload();
-        }
-        else if(isNaN(InputBox4))
-        {
-            alert('Wrong format of line available')
-            window.location.reload();
-        }
-        else if(isNaN(InputBox5))
-        {
-            alert('Wrong format of credit limit')
-            window.location.reload();
-        }            
-        else {
-         //เตรียมยัดข้อมูลตรงนี้ ถ้า Input2,3,4,5 มันว่าง ไม่ต้องอัพ}
-            if(InputBox2 !== ''){// ยัด InputBox2 อัพเดทค่า pin ของ accountID}
-            if(InputBox3 !== ''){// ยัด InputBox3 อัพเดทค่า cash balance ของ accountID}
-            if(InputBox4 !== ''){// ยัด InputBox4 อัพเดทค่า line available ของ accountID}
-            if(InputBox5 !== ''){// ยัด InputBox5 อัพเดทค่า credit limit ของ accountID
-        /*InputBox1 //account Id ที่ต้องการอัพเดท
-        InputBox2 //pin ที่ต้องการอัพเดท
-        InputBox3 //cash balance ที่ต้องการอัพเดท 
-        InputBox4 //line available ที่ต้องการอัพเดท
-        InputBox5 //credit limit ที่ต้องการอัพเดท*/
-    //******************** Edit*/
-  };
-
-  const handleSubmit3 = (event) => {
-    event.preventDefault();
-    (async () => {
-      await Get_account_data(InputBox1);
-      if ((await BrokerExist(InputBox0)) === 0) {
-        alert("Cannot find your broker ID");
-        window.location.reload();
-      } else if ((await AccountExist(Number(InputBox1))) === 0) {
-        alert("Cannot find the Account");
-        window.location.reload();
-      } else if (retreiveValue.broker_id !== Number(InputBox0)) {
-        alert("the account isn't belong to your broker");
-        window.location.reload();
-      } else {
-        await DeleteAccoount(InputBox1);
-        window.location.reload();
-      }
-    })();
-
-    // Perform any necessary actions with the input value
-    /*
-         if(InputBox1 ไม่เจอใน database){
-            alert('Cannot find the account id')
-            window.location.reload();
-        }
-        else if(InputBox1(account) มี แต่ broker_id ไม่ตรงกับ InputBox0 (broker ID))
-        {
-            alert('the account isn't belong to your broker')
-            window.location.reload();
- 
-        }
-        else{//ลบ accountID}
-        */
-    /*InputBox1 //accountID ที่ต้องการลบ
-        //********************ยัดข้อมูลตรงนี้ Delete*/
-    // window.location.reload();
-  };
+  const filteredAccounts = accountList.filter((acc) => {
+    const q = searchFilter.toLowerCase();
+    return (
+      String(acc.id).toLowerCase().includes(q) ||
+      String(acc.broker_id).toLowerCase().includes(q) ||
+      String(acc.user_id).toLowerCase().includes(q)
+    );
+  });
 
   return (
-    <div>
-      <h className="ManagementHeader1">Account Management</h>
-      <div className="button-group">
-        <button
-          className={`buttonAdd ${selectedButton === "Add" ? "selected" : ""}`}
-          onClick={() => handleButtonClick("Add")}
-        >
-          Add
-        </button>
-        <button
-          className={`buttonEdit ${
-            selectedButton === "Edit" ? "selected" : ""
-          }`}
-          onClick={() => handleButtonClick("Edit")}
-        >
-          Edit
-        </button>
-        <button
-          className={`buttonDelete ${
-            selectedButton === "Delete" ? "selected" : ""
-          }`}
-          onClick={() => handleButtonClick("Delete")}
-        >
-          Delete
-        </button>
+    <div className="account-mgmt-container">
+      <div className="mgmt-header-strip">
+        <h1 className="ManagementHeader1">
+          <i className="bx bx-slider-alt"></i> Account Management Console
+        </h1>
+        <div className="broker-bar">
+          <label><i className="bx bx-building"></i> Broker ID</label>
+          <input
+            type="text"
+            value={brokerId}
+            onChange={(e) => setBrokerId(e.target.value)}
+            placeholder="Broker ID..."
+            className="brokerBox"
+          />
+        </div>
       </div>
 
-      {selectedButton === "Add" && (
-        <div>
-          <form onSubmit={handleSubmit1}>
-            <input
-              type="text"
-              value={InputBox1}
-              onChange={handleInputChange1}
-              placeholder="Existing username..."
-              className="box_1_forSearch"
-            />
-            <input
-              type="text"
-              value={InputBox2}
-              onChange={handleInputChange2}
-              placeholder="Set the pin..."
-              className="box_2_input1"
-            />
-            <input
-              type="text"
-              value={InputBox3}
-              onChange={handleInputChange3}
-              placeholder="Set the credit Limit..."
-              className="box_3_input"
-            />
-            <button type="submit" className="submitAdd">
-              Create
+      <div className="mgmt-terminal-grid">
+        {/* Left Column: Form Action Card */}
+        <div className="mgmt-left-panel">
+          <div className="button-group">
+            <button
+              className={`buttonAdd ${selectedButton === "Add" ? "selected" : ""}`}
+              onClick={() => handleTabChange("Add")}
+            >
+              <i className="bx bx-plus-circle"></i> Add
             </button>
-          </form>
-          <button className="resetAdd" onClick={handleReset}>
-            Reset
-          </button>
-        </div>
-      )}
-
-      {selectedButton === "Edit" && (
-        <div>
-          <form onSubmit={handleSubmit2}>
-            <input
-              type="text"
-              value={InputBox1}
-              onChange={handleInputChange1}
-              placeholder="Existing account ID..."
-              className="box_1_forSearch"
-            />
-            <input
-              type="text"
-              value={InputBox2}
-              onChange={handleInputChange2}
-              placeholder="Change the pin {optional}"
-              className="box_2_input1"
-            />
-            <input
-              type="text"
-              value={InputBox3}
-              onChange={handleInputChange3}
-              placeholder="Change Cash Balance {optional}"
-              className="box_3_input"
-            />
-            <input
-              type="text"
-              value={InputBox4}
-              onChange={handleInputChange4}
-              placeholder="Change line available {optional}"
-              className="box_4_input"
-            />
-
-            <input
-              type="text"
-              value={InputBox5}
-              onChange={handleInputChange5}
-              placeholder="Change credit limit {optional}"
-              className="box_5_input"
-            />
-
-            <button type="submit" className="submitEdit1">
-              Update
+            <button
+              className={`buttonEdit ${selectedButton === "Edit" ? "selected" : ""}`}
+              onClick={() => handleTabChange("Edit")}
+            >
+              <i className="bx bx-edit"></i> Edit
             </button>
-          </form>
-          <button className="resetEdit1" onClick={handleReset}>
-            Reset
-          </button>
-        </div>
-      )}
-
-      {selectedButton === "Delete" && (
-        <div>
-          <form onSubmit={handleSubmit3}>
-            <input
-              type="text"
-              value={InputBox1}
-              onChange={handleInputChange1}
-              placeholder="Existing account ID"
-              className="box_1_forSearch"
-            />
-
-            <button type="submit" className="submitDelete">
-              Delete
+            <button
+              className={`buttonDelete ${selectedButton === "Delete" ? "selected" : ""}`}
+              onClick={() => handleTabChange("Delete")}
+            >
+              <i className="bx bx-trash"></i> Delete
             </button>
-          </form>
-          <button className="resetDelete" onClick={handleReset}>
-            Reset
-          </button>
-        </div>
-      )}
+          </div>
 
-      <input
-        type="text"
-        value={InputBox0}
-        onChange={handleInputChange0}
-        placeholder="Your broker ID"
-        className="brokerBox"
-      />
+          <div className="mgmt-form-card">
+            {selectedButton === "Add" && (
+              <form onSubmit={handleSubmitAdd} className="mgmt-form">
+                <div className="mgmt-form-group">
+                  <label>Target Username</label>
+                  <input
+                    type="text"
+                    value={accountIdOrUser}
+                    onChange={(e) => setAccountIdOrUser(e.target.value)}
+                    placeholder="Enter existing username..."
+                    required
+                  />
+                </div>
+                <div className="mgmt-form-group">
+                  <label>Account PIN (6 Digits)</label>
+                  <input
+                    type="password"
+                    maxLength={6}
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value)}
+                    placeholder="Set 6-digit PIN..."
+                    required
+                  />
+                </div>
+                <div className="mgmt-form-group">
+                  <label>Credit Limit (THB)</label>
+                  <input
+                    type="number"
+                    value={creditLimit}
+                    onChange={(e) => setCreditLimit(e.target.value)}
+                    placeholder="Set credit limit..."
+                  />
+                </div>
+                <div className="mgmt-actions">
+                  <button type="submit" className="submitAdd">
+                    Create Account
+                  </button>
+                  <button type="button" className="resetAdd" onClick={handleReset}>
+                    Reset
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {selectedButton === "Edit" && (
+              <form onSubmit={handleSubmitEdit} className="mgmt-form">
+                <div className="mgmt-form-group">
+                  <label>Account ID</label>
+                  <input
+                    type="text"
+                    value={accountIdOrUser}
+                    onChange={(e) => setAccountIdOrUser(e.target.value)}
+                    placeholder="Target Account ID..."
+                    required
+                  />
+                </div>
+                <div className="mgmt-form-group">
+                  <label>Update PIN (6 Digits)</label>
+                  <input
+                    type="password"
+                    maxLength={6}
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value)}
+                    placeholder="Leave blank to keep PIN..."
+                  />
+                </div>
+                <div className="mgmt-form-group">
+                  <label>Cash Balance (THB)</label>
+                  <input
+                    type="number"
+                    value={cashBalance}
+                    onChange={(e) => setCashBalance(e.target.value)}
+                    placeholder="Update cash balance..."
+                  />
+                </div>
+                <div className="mgmt-form-group">
+                  <label>Line Available (THB)</label>
+                  <input
+                    type="number"
+                    value={lineAvailable}
+                    onChange={(e) => setLineAvailable(e.target.value)}
+                    placeholder="Update line available..."
+                  />
+                </div>
+                <div className="mgmt-form-group">
+                  <label>Credit Limit (THB)</label>
+                  <input
+                    type="number"
+                    value={creditLimit}
+                    onChange={(e) => setCreditLimit(e.target.value)}
+                    placeholder="Update credit limit..."
+                  />
+                </div>
+                <div className="mgmt-actions">
+                  <button type="submit" className="submitEdit1">
+                    Update Account
+                  </button>
+                  <button type="button" className="resetEdit1" onClick={handleReset}>
+                    Reset
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {selectedButton === "Delete" && (
+              <form onSubmit={handleSubmitDelete} className="mgmt-form">
+                <div className="mgmt-form-group">
+                  <label>Account ID to Delete</label>
+                  <input
+                    type="text"
+                    value={accountIdOrUser}
+                    onChange={(e) => setAccountIdOrUser(e.target.value)}
+                    placeholder="Target Account ID..."
+                    required
+                  />
+                </div>
+                <div className="mgmt-actions">
+                  <button type="submit" className="submitDelete">
+                    Delete Account
+                  </button>
+                  <button type="button" className="resetDelete" onClick={handleReset}>
+                    Reset
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Live Data Table Panel */}
+        <div className="mgmt-right-panel">
+          <div className="mgmt-data-card">
+            <div className="mgmt-data-header">
+              <h3><i className="bx bx-table"></i> Live Accounts List</h3>
+              <div className="mgmt-search-box">
+                <i className="bx bx-search"></i>
+                <input
+                  type="text"
+                  placeholder="Filter accounts..."
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="mgmt-table-wrapper">
+              <table className="mgmt-data-table">
+                <thead>
+                  <tr>
+                    <th>Acc ID</th>
+                    <th>Broker ID</th>
+                    <th>User ID</th>
+                    <th>Cash Bal</th>
+                    <th>Line Available</th>
+                    <th>Credit Limit</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAccounts.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="no-data-td">
+                        No account records found.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredAccounts.map((acc) => (
+                      <tr
+                        key={acc.id}
+                        className="table-row-clickable"
+                        onClick={() => handleSelectTableRow(acc)}
+                        title="Click to select for Edit"
+                      >
+                        <td><strong>#{acc.id}</strong></td>
+                        <td>{acc.broker_id}</td>
+                        <td>{acc.user_id}</td>
+                        <td className="green-val">฿{(acc.cash_balance || 0).toLocaleString()}</td>
+                        <td>฿{(acc.line_available || 0).toLocaleString()}</td>
+                        <td>฿{(acc.credit_limit || 0).toLocaleString()}</td>
+                        <td>
+                          <button
+                            className="row-edit-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectTableRow(acc);
+                            }}
+                          >
+                            <i className="bx bx-edit"></i> Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default AccountManagement;
+
+

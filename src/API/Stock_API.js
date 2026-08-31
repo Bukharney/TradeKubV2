@@ -1,9 +1,9 @@
-import axios from "axios";
+import axiosClient from "./axiosClient";
 
 export const login = async (username, password) => {
   try {
-    const response = await axios.post(
-      "http://localhost:8000/login",
+    const response = await axiosClient.post(
+      "/login",
       {
         username: username,
         password: password,
@@ -22,7 +22,7 @@ export const login = async (username, password) => {
 
 export const get_news = async () => {
   try {
-    const response = await axios.get("http://localhost:8000/news");
+    const response = await axiosClient.get("/news");
     return response.data;
   } catch (error) {
     console.error(error);
